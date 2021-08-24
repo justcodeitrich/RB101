@@ -1,0 +1,27 @@
+welcome: "Welcome to the calculator! Enter your name:"
+valid_name: "Make sure to enter a valid name."
+valid_number: "Make sure to enter a valid number."
+ask_first_number: "What's the first number?"
+ask_second_number: "What's the second number?"
+operator_prompt: "What operation would you like to perform?\n
+   \n 1) add 
+   \n 2) subtract 
+   \n 3) multiply 
+   \n 4) divide " 
+operator_selection_error: "Must select 1, 2, 3 or 4."
+do_it_again?: "Do you want to perform another calculation? (Y to calculate again)"
+goodbye_message: "Thanks for using the calculator!"
+
+language_select: "Please choose your preferred language (type 1 or 2): \n
+\n 1) English
+\n 2) Spanish"
+
+hi: 'Hi'
+adding: 'Adding the two numbers...'
+subtracting: 'Subtracting the two numbers...'
+multiplying: 'Multiplying the two numbers...'
+dividing: 'Dividing the two numbers...'
+result: 'The result is'
+
+
+
