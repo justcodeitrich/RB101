@@ -9,7 +9,7 @@ operator_prompt: "What operation would you like to perform?\n
    \n 3) multiply 
    \n 4) divide " 
 operator_selection_error: "Must select 1, 2, 3 or 4."
-do_it_again?: "Do you want to perform another calculation? (Y to calculate again)"
+do_it_again?: "Do you want to perform another calculation? (Y to calculate again, N to exit)"
 goodbye_message: "Thanks for using the calculator!"
 
 language_select: "Please choose your preferred language (type 1 or 2): \n

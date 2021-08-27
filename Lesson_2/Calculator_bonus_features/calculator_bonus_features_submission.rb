@@ -23,15 +23,14 @@ end
 def operation_to_message(op)
   case op
   when '1'
-    return LANGUAGE['adding']
+    LANGUAGE['adding']
   when '2'
-    return LANGUAGE['subtracting']
+    LANGUAGE['subtracting']
   when '3'
-    return LANGUAGE['multiplying']
+    LANGUAGE['multiplying']
   when '4'
-    return LANGUAGE['dividing']
+    LANGUAGE['dividing']
   end
-  puts "Extra code placed here"
 end
 
 prompt(MESSAGES['language_select'])
@@ -49,6 +48,8 @@ else
   LANGUAGE = SPANISH_MESSAGES
 end
 
+system('clear')
+
 prompt(LANGUAGE['welcome'])
 
 name = ''
@@ -62,10 +63,10 @@ loop do
     break
   end
 end
-
+system('clear')
 prompt(LANGUAGE['hi'] + " #{name}!")
 
-loop do 
+loop do
   number1 = nil
   number2 = nil
 
@@ -91,6 +92,8 @@ loop do
     end
   end
 
+  system('clear')
+
   prompt(LANGUAGE['operator_prompt'])
   operator = ''
   loop do
@@ -103,23 +106,44 @@ loop do
     end
   end
 
+  system('clear')
+
   prompt(operation_to_message(operator).to_s)
 
   result = case operator
            when '1'
-             number1.to_i() + number2.to_i()
+             if number1.include?('.') || number2.include?('.')
+               number1.to_f() + number2.to_f()
+             else
+               number1.to_i() + number2.to_i()
+             end
            when '2'
-             number1.to_i() - number2.to_i()
+             if number1.include?('.') || number2.include?('.')
+               number1.to_f() - number2.to_f()
+             else
+               number1.to_i() - number2.to_i()
+             end
            when '3'
-             number1.to_i() * number2.to_i()
+             if number1.include?('.') || number2.include?('.')
+               number1.to_f() * number2.to_f()
+             else
+               number1.to_i() * number2.to_i()
+             end
            when '4'
-             number1.to_f() / number2.to_f()
+             if number1.to_f() == 0.0 || number2.to_f() == 0.0
+               "undefined as a result of division by 0"
+             else
+               number1.to_f() / number2.to_f()
+             end
            end
   prompt(LANGUAGE['result'] + " #{result}.")
 
   prompt(LANGUAGE['do_it_again?'])
   answer = Kernel.gets().chomp()
   break unless answer.downcase().start_with?('y')
+  system('clear')
 end
 
 prompt(LANGUAGE['goodbye_message'])
+
+system('clear')

@@ -9,7 +9,8 @@ operator_prompt: "¿Qué operación le gustaría realizar? \n
    \n 3) multiplicar 
    \n 4) dividir " 
 operator_selection_error: "Debe seleccionar 1, 2, 3 o 4."
-do_it_again?: "¿Quieres realizar otro cálculo? (Y para calcular de nuevo)"
+do_it_again?: "¿Quieres realizar otro cálculo? (
+Y para calcular de nuevo, N para salir)"
 goodbye_message: "¡Gracias por usar la calculadora!"
 
 hi: 'Hola'
