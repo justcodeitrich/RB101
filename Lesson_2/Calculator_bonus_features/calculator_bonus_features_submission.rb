@@ -57,12 +57,10 @@ name = ''
 loop do
   name = Kernel.gets().chomp()
 
-  if name.empty?()
-    prompt(LANGUAGE['valid_name'])
-  else
-    break
-  end
+  break unless name.empty?()
+  prompt(LANGUAGE['valid_name'])
 end
+
 system('clear')
 prompt(LANGUAGE['hi'] + " #{name}!")
 
@@ -74,22 +72,16 @@ loop do
     prompt(LANGUAGE['ask_first_number'])
     number1 = Kernel.gets().chomp()
 
-    if number?(number1)
-      break
-    else
-      prompt(LANGUAGE['valid_number'])
-    end
+    break if number?(number1)
+    prompt(LANGUAGE['valid_number'])
   end
 
   loop do
     prompt(LANGUAGE['ask_second_number'])
     number2 = Kernel.gets().chomp()
 
-    if number?(number2)
-      break
-    else
-      prompt(LANGUAGE['valid_number'])
-    end
+    break if number?(number2)
+    prompt(LANGUAGE['valid_number'])
   end
 
   system('clear')
@@ -99,11 +91,8 @@ loop do
   loop do
     operator = Kernel.gets().chomp()
 
-    if %w(1 2 3 4).include?(operator)
-      break
-    else
-      prompt(LANGUAGE["operator_selection_error"])
-    end
+    break if %w(1 2 3 4).include?(operator)
+    prompt(LANGUAGE["operator_selection_error"])
   end
 
   system('clear')
