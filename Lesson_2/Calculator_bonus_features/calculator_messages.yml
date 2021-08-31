@@ -23,5 +23,6 @@ multiplying: 'Multiplying the two numbers...'
 dividing: 'Dividing the two numbers...'
 result: 'The result is'
 
+again_error: "Please type Y to calculate again or N to exit calculator"
 
 

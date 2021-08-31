@@ -19,3 +19,4 @@ subtracting: 'Restar los dos números...'
 multiplying: 'Multiplicando los dos números...'
 dividing: 'Dividiendo los dos números...'
 result: 'El resultado es'
+again_error: "Escriba Y para calcular de nuevo o N para salir de la calculadora"
