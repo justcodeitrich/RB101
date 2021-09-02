@@ -1,3 +1,4 @@
+require 'pry'
 require 'yaml'
 MESSAGES = YAML.load_file('calculator_messages.yml')
 SPANISH_MESSAGES = YAML.load_file('spanish_calculator_messages.yml')
@@ -110,17 +111,17 @@ def calculate_again?
   loop do
     answer = gets.chomp
     if answer.downcase == 'y' || answer.downcase == 'yes'
-    go_again = true
-    break
+      go_again = true
+      break
     elsif answer.downcase == 'n' || answer.downcase == 'no'
-    go_again = false
-    break
+      go_again = false
+      break
     else
       prompt(LANGUAGE['again_error'])
     end
   end
   go_again
-end 
+end
 
 prompt(MESSAGES['language_select'])
 
