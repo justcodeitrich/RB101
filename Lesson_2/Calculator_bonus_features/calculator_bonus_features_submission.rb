@@ -104,6 +104,24 @@ def calc(op, n1, n2)
   result
 end
 
+def calculate_again?
+  answer = ''
+  go_again = nil
+  loop do
+    answer = gets.chomp
+    if answer.downcase == 'y' || answer.downcase == 'yes'
+    go_again = true
+    break
+    elsif answer.downcase == 'n' || answer.downcase == 'no'
+    go_again = false
+    break
+    else
+      prompt(LANGUAGE['again_error'])
+    end
+  end
+  go_again
+end 
+
 prompt(MESSAGES['language_select'])
 
 language_preference = nil
@@ -144,23 +162,10 @@ loop do
 
   prompt(operation_to_message(operator).to_s)
 
-  result = calc(operator, number1, number2)
-
-  prompt(LANGUAGE['result'] + " #{result}.")
+  prompt(LANGUAGE['result'] + " #{calc(operator, number1, number2)}.")
   prompt(LANGUAGE['do_it_again?'])
 
-  answer = ''
-
-  loop do
-    answer = gets.chomp
-    if answer.downcase == 'y' || answer.downcase == 'yes'
-      break
-    elsif answer.downcase == 'n' || answer.downcase == 'no'
-      prompt(LANGUAGE['goodbye_message'])
-      break
-    else
-      prompt(LANGUAGE['again_error'])
-    end
-  end
-  break if answer.downcase == 'n' || answer.downcase == 'no'
+  break unless calculate_again?
 end
+
+prompt(LANGUAGE['goodbye_message'])
