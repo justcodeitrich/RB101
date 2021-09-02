@@ -1,4 +1,3 @@
-require 'pry'
 require 'yaml'
 MESSAGES = YAML.load_file('calculator_messages.yml')
 SPANISH_MESSAGES = YAML.load_file('spanish_calculator_messages.yml')
