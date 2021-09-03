@@ -74,7 +74,6 @@ def operation(operator)
   operator
 end
 
-# convert numbers to floats or integers prior to passing them into calc
 def to_f_or_i(num)
   if num.include?('.')
     num.to_f
