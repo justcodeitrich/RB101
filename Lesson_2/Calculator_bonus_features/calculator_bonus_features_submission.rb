@@ -74,26 +74,23 @@ def operation(operator)
   operator
 end
 
+# convert numbers to floats or integers prior to passing them into calc
+def to_f_or_i(num)
+  if num.include?('.')
+    num.to_f
+  else
+    num.to_i
+  end
+end
+
 def calc(op, n1, n2)
   result =  case op
             when '1'
-              if n1.include?('.') || n2.include?('.')
-                n1.to_f + n2.to_f
-              else
-                n1.to_i + n2.to_i
-              end
+              n1 + n2
             when '2'
-              if n1.include?('.') || n2.include?('.')
-                n1.to_f - n2.to_f
-              else
-                n1.to_i - n2.to_i
-              end
+              n1 - n2
             when '3'
-              if n1.include?('.') || n2.include?('.')
-                n1.to_f * n2.to_f
-              else
-                n1.to_i * n2.to_i
-              end
+              n1 * n2
             when '4'
               if n1.to_f == 0.0 || n2.to_f == 0.0
                 "undefined as a result of division by 0"
@@ -149,8 +146,8 @@ loop do
   number1 = nil
   number2 = nil
 
-  number1 = first_number(number1)
-  number2 = second_number(number2)
+  number1 = to_f_or_i(first_number(number1))
+  number2 = to_f_or_i(second_number(number2))
 
   system('clear')
 
