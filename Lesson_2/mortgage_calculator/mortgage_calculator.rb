@@ -91,6 +91,8 @@
 - If necessary, convert the output into the appropriate data type
 - Then display the results of the 1) monthly interest rate, 2) loan duration in months, 3) monthly payment to user
 - Ask user if they want to calculate another loan payment
+ 
+  # - 9/5
 
 # CODE with intent - If you find that your algorithm doesn't work, return there FIRST and THEN fix your code
 # TEST FREQUENTLY
@@ -145,7 +147,6 @@ WHILE
       BREAK
     ELSE
       PRINT to user to give valid input
-      
 
   SET loan duration in months (N) - loan duration * 12 months
   SET monthly interest rate (J) - APR / 12 months
@@ -166,11 +167,15 @@ WHILE
 
 END
 
+********** EDGE CASES **********
+-user_input_apr not accepting integers because of the way input is being validated
+
 REFACTORING:
+- CLEARER INSTRUCTIONS
 - YAML FILE
 - METHOD REFACTORING
 - RUBOCOP
-
+- Rounding numbers
 =end
 
 puts "Welcome to mortgage calculator!"
@@ -179,24 +184,31 @@ user_input_loan_amount = nil
 user_input_apr = nil
 user_input_loan_duration = nil
 
+loop do
 
-  puts "Please input your total loan amount excluding dollar signs ($) and commas (,)."
+  puts "Please input your total loan amount rounded up to the nearest integer. 
+  Exclude dollar signs ($) and commas (,)."
   loop do 
     user_input_loan_amount = gets.chomp
-    if user_input_loan_amount.to_i.to_s == user_input_loan_amount
+    if (user_input_loan_amount.to_i.to_s == user_input_loan_amount) && (user_input_loan_amount.to_i > 0)
       break
     else 
-      puts "Must be a valid number without symbols"
+      puts "Must be a valid number whole number without symbols"
     end
   end
 
-  puts "Please input your APR (Annual Percentage Rate). Example format - 8.875"
+  puts "Please input your APR (Annual Percentage Rate). 
+  Example format - 10 for 10%, 2.325 for 2.325%"
   loop do 
     user_input_apr = gets.chomp
-    if user_input_apr.to_f.to_s == user_input_apr
+    if (user_input_apr.include?('.')) && (user_input_apr.to_i > 0)
+      user_input_apr.to_f.to_s == user_input_apr
+      break
+    elsif (user_input_apr.to_i.to_s == user_input_apr) && (user_input_apr.to_i > 0)
       break
     else 
-      puts "Must be a valid percentage"
+      puts "Must be a valid percentage as a whole number. 
+      Example: Input 10 for 10% APR or 15.5 for 15.5% APR"
     end
   end
 
@@ -205,27 +217,62 @@ user_input_loan_duration = nil
 
   loop do 
     user_input_loan_duration = gets.chomp
-    if user_input_loan_duration
+    if user_input_loan_duration.include?(',') 
       user_input_loan_duration.split(',')
+      # validate that each element of the array is an integer
+      loop do
+        input_check = user_input_loan_duration
+        if input_check.each do |number|
+          number.to_i.to_s == number
+          break
+        else 
+          puts "Must be integers"
+          input_check = gets.chomp
+          # Right now im figuring out how to validate both the commas in the outer loop and then the validate that each element 
+          # within the user input is a number
+        end
+      end
+
       break
     else 
       puts "Must be valid format of years, months"
     end
   end
 
-def duration_in_months(input)
-  input.split(',')
+  def duration_in_months(input)
+    input_split = input.split(',')
+    (input_split[0].to_i * 12) + (input_split[1].to_i)
+  end
+
+  # # M = monthly payment
+  monthly_payment = nil
+  # # P = loan amount
+  loan_amount = user_input_loan_amount.to_i
+  # # J = monthly interest rate
+  monthly_interest_rate = ((user_input_apr.to_f/100)/12)
+  # # N = loan duration in months
+  monthly_loan_duration = duration_in_months(user_input_loan_duration)
+  # m = p * (j / (1 - (1 + j)**(-n)))
+  p monthly_payment = (loan_amount) * ( monthly_interest_rate / (1 - ( 1 + monthly_interest_rate) ** ( -monthly_loan_duration)))
+
+  puts "Your monthly payment is $#{monthly_payment}"
+  puts "Your monthly interest rate is #{monthly_interest_rate * 100}"
+  puts "Your loan duration is #{monthly_loan_duration} months"
+
+  puts "Do you want to calculate another loan? (Y to calculate again or N to exit)"
+  go_again = nil
+
+  loop do
+    go_again = gets.chomp
+    if go_again.downcase == 'y'
+      go_again = true
+      break
+    elsif go_again.downcase == 'n'
+      go_again = false 
+      break
+    end
+  end
+  break if go_again == false
 end
 
-# # M = monthly payment
-# monthly_payment = nil
-# # P = loan amount
-# loan_amount = user_input_loan_amount.to_i
-# # J = monthly interest rate
-# monthly_interest_rate = ((user_input_apr/12)*100)
-# # N = loan duration in months
-# monthly_loan_duration = nil
-
-p duration_in_months(user_input_loan_duration)
-
-#I left off creating a method to take user input of loan duration and splitting it into an array
+puts "Thanks for using the mortgage calculator!"
