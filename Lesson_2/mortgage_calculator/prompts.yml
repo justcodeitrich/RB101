@@ -6,7 +6,7 @@ input_total_loan: "Please input your total loan amount rounded up to the nearest
 input_total_loan_error: "Must be a valid number whole number without symbols"
 input_apr: "Please input your APR (Annual Percentage Rate). 
   Example format - 10 for 10%, 2.325 for 2.325%"
-input_apr_error: "Must be a valid percentage as a whole number. 
+input_apr_error: "Must be a valid percentage as a whole number or decimal. 
       Input 10 for 10% APR or 15.5 for 15.5% APR"
 total_loan_duration: "Please input your total loan duration in years and months. 
   Example: If your loan duration is 10 years and 3 months, type in 10,3"
