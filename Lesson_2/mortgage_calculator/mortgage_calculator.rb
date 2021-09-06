@@ -3,7 +3,7 @@
 
 # # Problem - build a mortgage calculator
 
-# Input 
+# Input
 # 1. Loan amount
 # 2. Annual Percentage Rate (APR)
 # 3. Loan duration
@@ -168,20 +168,16 @@ WHILE
 END
 
 ********** EDGE CASES **********
--user_input_apr not accepting integers because of the way input is being validated
 
 REFACTORING:
-- CLEARER INSTRUCTIONS
+DONE - CLEARER INSTRUCTIONS
 DONE - YAML FILE
-- METHOD REFACTORING
+DONE - METHOD REFACTORING
 - RUBOCOP
 DONE - Rounding numbers 
-- Clear screen
+DONE - Clear screen
 - Give total interest paid
-- SLEEP TIMER
 =end
-
-
 
 require 'yaml'
 MESSAGES = YAML.load_file('prompts.yml')
@@ -213,7 +209,7 @@ def get_loan_amount
       prompt(MESSAGES['input_total_loan_error'])
     end
   end
-  input
+  input.to_i
 end
 
 def get_apr
@@ -287,9 +283,15 @@ def calculate_again?
     elsif go_again.downcase == 'n'
       go_again = false 
       break
+    else
+      prompt(MESSAGES['calculate_again_error'])
     end
   end
   go_again
+end
+
+def clear_screen
+  system('clear')
 end
 
 prompt(MESSAGES['welcome'])
@@ -300,22 +302,24 @@ user_input_loan_duration = nil
 
 loop do
 
-  user_input_loan_amount = get_loan_amount
+  loan_amount = get_loan_amount
+  
+  clear_screen
   user_input_apr = get_apr
+  
+  clear_screen
   user_input_loan_duration = get_loan_duration
-
-  # # P = loan amount
-  loan_amount = user_input_loan_amount.to_i
-  # # J = monthly interest rate
+  
+  clear_screen
+  
   monthly_interest_rate = ((user_input_apr.to_f/100)/12)
-  # # N = loan duration in months
   monthly_loan_duration = duration_in_months(user_input_loan_duration)
-  # m = p * (j / (1 - (1 + j)**(-n)))
   monthly_payment = get_monthly_payment(loan_amount,monthly_interest_rate,monthly_loan_duration)
 
   results(monthly_payment,monthly_interest_rate,monthly_loan_duration)
-
+  
   break if calculate_again? == false
+  clear_screen
 end
 
 prompt(MESSAGES['goodbye'])

@@ -2,14 +2,16 @@
 
 welcome: "Welcome to the mortgage calculator!"
 input_total_loan: "Please input your total loan amount rounded up to the nearest integer.\n
-              Exclude dollar signs ($) and commas (,)."
+  Exclude dollar signs ($) and commas (,)."
 input_total_loan_error: "Must be a valid number whole number without symbols"
-input_apr: "Please input your APR (Annual Percentage Rate). 
-  Example format - 10 for 10%, 2.325 for 2.325%"
-input_apr_error: "Must be a valid percentage as a whole number or decimal. 
-      Input 10 for 10% APR or 15.5 for 15.5% APR"
-total_loan_duration: "Please input your total loan duration in years and months. 
-  Example: If your loan duration is 10 years and 3 months, type in 10,3"
+input_apr: "Please input your APR (Annual Percentage Rate).\n
+  Example format - 10 for 10% APR, 2.325 for 2.325% APR"
+input_apr_error: "Must be a valid percentage as a whole number or decimal.\n
+  Input 10 for 10% APR or 15.5 for 15.5% APR"
+total_loan_duration: "Please input your total loan duration in years and months.\n 
+  Example format: For a loan duration of 10 years and 3 months, type in 10,3"
 total_loan_duration_integer_error: "Please input positive integers only in the format of years,months"
-total_loan_duration_comma_error: "Please include a comma to separate years and months integers. Ex. 10 years 3 months is 10,3"
+total_loan_duration_comma_error: "Please include a comma to separate years and months integers.\n
+Ex. 10 years 3 months is 10,3"
 goodbye: "Thanks for using the mortgage calculator!"
+calculate_again_error: "Type Y to calculate again or N to exit"
