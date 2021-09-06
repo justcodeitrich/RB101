@@ -175,7 +175,9 @@ REFACTORING:
 - YAML FILE
 - METHOD REFACTORING
 - RUBOCOP
-- Rounding numbers
+- Rounding numbers DONE
+- Clear screen
+- Give total interest paid
 =end
 
 puts "Welcome to mortgage calculator!"
@@ -218,30 +220,29 @@ loop do
   loop do 
     user_input_loan_duration = gets.chomp
     if user_input_loan_duration.include?(',') 
-      user_input_loan_duration.split(',')
-      # validate that each element of the array is an integer
+      user_input_loan_duration = user_input_loan_duration.split(',') 
+      
+      i = 0
       loop do
-        input_check = user_input_loan_duration
-        if input_check.each do |number|
-          number.to_i.to_s == number
+        if (user_input_loan_duration[i].to_i.to_s == user_input_loan_duration[i]) && (user_input_loan_duration[i].to_i >= 0) && ((user_input_loan_duration[0].to_i + user_input_loan_duration[1].to_i) > 0)
+          i += 1
+          break if i > 1
+        else
+          puts "Please input positive integers only in the format of years,months"
           break
-        else 
-          puts "Must be integers"
-          input_check = gets.chomp
-          # Right now im figuring out how to validate both the commas in the outer loop and then the validate that each element 
-          # within the user input is a number
         end
       end
+      next if i < 2 
 
-      break
     else 
-      puts "Must be valid format of years, months"
+      puts "Please include a comma to separate years and months integers. Ex. 10 years 3 months is 10,3"
+      next
     end
+    break
   end
 
   def duration_in_months(input)
-    input_split = input.split(',')
-    (input_split[0].to_i * 12) + (input_split[1].to_i)
+    (input[0].to_i * 12) + (input[1].to_i)
   end
 
   # # M = monthly payment
@@ -253,12 +254,11 @@ loop do
   # # N = loan duration in months
   monthly_loan_duration = duration_in_months(user_input_loan_duration)
   # m = p * (j / (1 - (1 + j)**(-n)))
-  p monthly_payment = (loan_amount) * ( monthly_interest_rate / (1 - ( 1 + monthly_interest_rate) ** ( -monthly_loan_duration)))
+  monthly_payment = (loan_amount) * ( monthly_interest_rate / (1 - ( 1 + monthly_interest_rate) ** ( -monthly_loan_duration)))
 
-  puts "Your monthly payment is $#{monthly_payment}"
-  puts "Your monthly interest rate is #{monthly_interest_rate * 100}"
-  puts "Your loan duration is #{monthly_loan_duration} months"
-
+  puts "Your monthly payment is $#{monthly_payment.round(2)}"
+  puts "Your monthly interest rate is #{(monthly_interest_rate * 100).round(2)}%"
+  puts "Your monthly loan duration is #{monthly_loan_duration} months"
   puts "Do you want to calculate another loan? (Y to calculate again or N to exit)"
   go_again = nil
 
