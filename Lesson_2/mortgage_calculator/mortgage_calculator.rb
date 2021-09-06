@@ -172,15 +172,30 @@ END
 
 REFACTORING:
 - CLEARER INSTRUCTIONS
-- YAML FILE
+DONE - YAML FILE
 - METHOD REFACTORING
 - RUBOCOP
-- Rounding numbers DONE
+DONE - Rounding numbers 
 - Clear screen
 - Give total interest paid
+- SLEEP TIMER
 =end
 
-puts "Welcome to mortgage calculator!"
+
+
+require 'yaml'
+MESSAGES = YAML.load_file('prompts.yml')
+
+def prompt(input)
+  puts ">>> #{input}"
+end
+
+def duration_in_months(input)
+  (input[0].to_i * 12) + (input[1].to_i)
+end
+
+prompt(MESSAGES['welcome'])
+sleep(1)
 
 user_input_loan_amount = nil
 user_input_apr = nil
@@ -188,19 +203,17 @@ user_input_loan_duration = nil
 
 loop do
 
-  puts "Please input your total loan amount rounded up to the nearest integer. 
-  Exclude dollar signs ($) and commas (,)."
+  prompt(MESSAGES['input_total_loan'])
   loop do 
     user_input_loan_amount = gets.chomp
     if (user_input_loan_amount.to_i.to_s == user_input_loan_amount) && (user_input_loan_amount.to_i > 0)
       break
     else 
-      puts "Must be a valid number whole number without symbols"
+      prompt(MESSAGES['input_total_loan_error'])
     end
   end
 
-  puts "Please input your APR (Annual Percentage Rate). 
-  Example format - 10 for 10%, 2.325 for 2.325%"
+  prompt(MESSAGES['input_apr'])
   loop do 
     user_input_apr = gets.chomp
     if (user_input_apr.include?('.')) && (user_input_apr.to_i > 0)
@@ -209,13 +222,11 @@ loop do
     elsif (user_input_apr.to_i.to_s == user_input_apr) && (user_input_apr.to_i > 0)
       break
     else 
-      puts "Must be a valid percentage as a whole number. 
-      Example: Input 10 for 10% APR or 15.5 for 15.5% APR"
+      prompt(MESSAGES['input_apr_error'])
     end
   end
 
-  puts "Please input your total loan duration in years and months. 
-  Example: If your loan duration is 10 years and 3 months, type in 10,3"
+  prompt(MESSAGES['total_loan_duration'])
 
   loop do 
     user_input_loan_duration = gets.chomp
@@ -228,22 +239,20 @@ loop do
           i += 1
           break if i > 1
         else
-          puts "Please input positive integers only in the format of years,months"
+          prompt(MESSAGES['total_loan_duration_integer_error'])
           break
         end
       end
       next if i < 2 
 
     else 
-      puts "Please include a comma to separate years and months integers. Ex. 10 years 3 months is 10,3"
+      prompt(MESSAGES['total_loan_duration_comma_error'])
       next
     end
     break
   end
 
-  def duration_in_months(input)
-    (input[0].to_i * 12) + (input[1].to_i)
-  end
+
 
   # # M = monthly payment
   monthly_payment = nil
@@ -256,10 +265,10 @@ loop do
   # m = p * (j / (1 - (1 + j)**(-n)))
   monthly_payment = (loan_amount) * ( monthly_interest_rate / (1 - ( 1 + monthly_interest_rate) ** ( -monthly_loan_duration)))
 
-  puts "Your monthly payment is $#{monthly_payment.round(2)}"
-  puts "Your monthly interest rate is #{(monthly_interest_rate * 100).round(2)}%"
-  puts "Your monthly loan duration is #{monthly_loan_duration} months"
-  puts "Do you want to calculate another loan? (Y to calculate again or N to exit)"
+  prompt("Your monthly payment is $#{monthly_payment.round(2)}")
+  prompt( "Your monthly interest rate is #{(monthly_interest_rate * 100).round(2)}%")
+  prompt( "Your monthly loan duration is #{monthly_loan_duration} months")
+  prompt( "Do you want to calculate another loan? (Y to calculate again or N to exit)")
   go_again = nil
 
   loop do
@@ -275,4 +284,4 @@ loop do
   break if go_again == false
 end
 
-puts "Thanks for using the mortgage calculator!"
+prompt(MESSAGES['goodbye'])
