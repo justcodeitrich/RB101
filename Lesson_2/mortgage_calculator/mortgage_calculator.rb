@@ -121,6 +121,7 @@ user_input_apr = nil
 user_input_loan_duration = nil
 
 loop do
+  clear_screen
   loan_amount = get_loan_amount
   clear_screen
   user_input_apr = get_apr
