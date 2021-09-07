@@ -13,8 +13,8 @@ def input_validate?(input)
   (input.to_i.to_s == input) && (input.to_i > 0)
 end
 
-def loan_duration_valid?(input, i)
-  (input[i].to_i.to_s == input[i]) && (input[i].to_i >= 0) && ((input[0].to_i + input[1].to_i) > 0)
+def loan_duration_valid?(a, i)
+  (a[i].to_i.to_s == a[i]) && (a[i].to_i >= 0) && ((a[0].to_i + a[1].to_i) > 0)
 end
 
 def get_loan_amount
@@ -37,11 +37,8 @@ def get_apr
   loop do
     input = gets.chomp
     if (input.include?('.')) && (input.to_i > 0)
-      if input.to_f.to_s == input
-        break
-      else
-        prompt(MESSAGES['input_apr_error'])
-      end
+      break if input.to_f.to_s == input
+      prompt(MESSAGES['input_apr_error'])
     elsif input_validate?(input)
       break
     else
@@ -51,25 +48,32 @@ def get_apr
   input
 end
 
+def loan_duration_input_check(input, counter)
+  loop do
+    if loan_duration_valid?(input, counter)
+      counter += 1
+      break if counter > 1
+    else
+      prompt(MESSAGES['total_loan_duration_integer_error'])
+      break
+    end
+  end
+  counter
+end
+
+def ask_for_loan_duration
+  prompt(MESSAGES['total_loan_duration'])
+end
+
 def get_loan_duration
   input = nil
-  prompt(MESSAGES['total_loan_duration'])
-
   loop do
     input = gets.chomp
     if input.include?(',')
       input = input.split(',')
-      count = 0
-      loop do
-        if loan_duration_valid?(input, count)
-          count += 1
-          break if count > 1
-        else
-          prompt(MESSAGES['total_loan_duration_integer_error'])
-          break
-        end
-      end
-      next if count < 2
+      counter = 0
+      counter = loan_duration_input_check(input, counter)
+      next if counter < 2
     else
       prompt(MESSAGES['total_loan_duration_comma_error'])
       next
@@ -79,15 +83,15 @@ def get_loan_duration
   input
 end
 
-def get_monthly_payment(loan_amount, monthly_interest_rate, monthly_loan_duration)
-  (loan_amount) * (monthly_interest_rate / (1 - (1 + monthly_interest_rate)**(-monthly_loan_duration)))
+def get_mnth_pay(loan_amt, mnth_int_rate, mnth_loan_dura)
+  (loan_amt) * (mnth_int_rate / (1 - (1 + mnth_int_rate)**(-mnth_loan_dura)))
 end
 
-def results(monthly_payment, monthly_interest_rate, monthly_loan_duration)
+def results(monthly_payment, mnth_int_rate, monthly_loan_duration)
   prompt("Your monthly payment is $#{monthly_payment.round(2)}")
-  prompt("Your monthly interest rate is #{(monthly_interest_rate * 100).round(2)}%")
+  prompt("Your monthly interest rate is #{(mnth_int_rate * 100).round(2)}%")
   prompt("Your monthly loan duration is #{monthly_loan_duration} months")
-  prompt("Do you want to calculate another loan? (Y to calculate again or N to exit)")
+  prompt(MESSAGES['again?'])
 end
 
 def calculate_again?
@@ -113,7 +117,6 @@ end
 
 prompt(MESSAGES['welcome'])
 
-user_input_loan_amount = nil
 user_input_apr = nil
 user_input_loan_duration = nil
 
@@ -122,12 +125,13 @@ loop do
   clear_screen
   user_input_apr = get_apr
   clear_screen
+  ask_for_loan_duration
   user_input_loan_duration = get_loan_duration
   clear_screen
-  monthly_interest_rate = ((user_input_apr.to_f / 100) / 12)
-  monthly_loan_duration = duration_in_months(user_input_loan_duration)
-  monthly_payment = get_monthly_payment(loan_amount, monthly_interest_rate, monthly_loan_duration)
-  results(monthly_payment, monthly_interest_rate, monthly_loan_duration)
+  mnth_int_rate = ((user_input_apr.to_f / 100) / 12)
+  mnth_loan_dura = duration_in_months(user_input_loan_duration)
+  mnth_pay = get_mnth_pay(loan_amount, mnth_int_rate, mnth_loan_dura)
+  results(mnth_pay, mnth_int_rate, mnth_loan_dura)
   break if calculate_again? == false
   clear_screen
 end
