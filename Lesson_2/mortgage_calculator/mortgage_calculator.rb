@@ -10,7 +10,7 @@ def duration_in_months(input)
 end
 
 def input_validate?(input)
-  (input.to_i.to_s == input) && (input.to_i > 0)
+  (input.to_i.to_s == input) && (input.to_f > 0.001)
 end
 
 def loan_duration_valid?(a, i)
@@ -36,7 +36,7 @@ def get_apr
   prompt(MESSAGES['input_apr'])
   loop do
     input = gets.chomp
-    if (input.include?('.')) && (input.to_i > 0)
+    if (input.include?('.')) && (input.to_f > 0.001)
       break if input.to_f.to_s == input
       prompt(MESSAGES['input_apr_error'])
     elsif input_validate?(input)
@@ -74,6 +74,11 @@ def get_loan_duration
       counter = 0
       counter = loan_duration_input_check(input, counter)
       next if counter < 2
+    elsif 
+      input = input.split
+      counter = 0
+      counter = loan_duration_input_check(input, counter)
+      next if counter < 1
     else
       prompt(MESSAGES['total_loan_duration_comma_error'])
       next
@@ -98,10 +103,10 @@ def calculate_again?
   go_again = nil
   loop do
     go_again = gets.chomp
-    if go_again.downcase == 'y'
+    if go_again.downcase == 'y' || go_again.downcase == 'yes'
       go_again = true
       break
-    elsif go_again.downcase == 'n'
+    elsif go_again.downcase == 'n' || go_again.downcase == 'no'
       go_again = false
       break
     else
