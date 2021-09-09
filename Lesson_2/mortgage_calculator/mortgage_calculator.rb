@@ -37,11 +37,6 @@ def get_apr
   input
 end
 
-
-def ask_for_loan_duration
-  prompt(MESSAGES['total_loan_duration'])
-end
-
 def valid_input_with_comma?(input) # Test
   input.include?(',')
   input = input.split(',')
@@ -72,6 +67,7 @@ def loan_duration_input_check(input)
 end
 
 def get_loan_duration
+  prompt(MESSAGES['total_loan_duration'])
   input = gets.chomp
   until valid_input_with_comma?(input) || valid_input_no_comma?(input)
     prompt(MESSAGES['total_loan_duration_integer_error'])
@@ -85,18 +81,11 @@ def get_mnth_pay(loan_amt, mnth_int_rate, mnth_loan_dura)
 end
 
 def calculate_again?
-  go_again = nil
+  go_again = gets.chomp.downcase
   loop do
-    go_again = gets.chomp
-    if go_again.downcase == 'y' || go_again.downcase == 'yes'
-      go_again = true
-      break
-    elsif go_again.downcase == 'n' || go_again.downcase == 'no'
-      go_again = false
-      break
-    else
-      prompt(MESSAGES['calculate_again_error'])
-    end
+    break if go_again.start_with?('y') || go_again.start_with?('n')
+    prompt(MESSAGES['calculate_again_error'])
+    go_again = gets.chomp.downcase
   end
   go_again
 end
@@ -113,7 +102,6 @@ loop do
   clear_screen
   user_input_apr = get_apr
   clear_screen
-  ask_for_loan_duration
   user_input_loan_duration = get_loan_duration
   clear_screen
   mnth_int_rate = ((user_input_apr.to_f / 100) / 12)
@@ -128,7 +116,7 @@ loop do
 
   prompt(results_message)
   prompt(MESSAGES['again?'])
-  break if calculate_again? == false
+  break if calculate_again?.start_with?('n')
   clear_screen
 end
 

@@ -14,5 +14,5 @@ total_loan_duration_integer_error: "Please input positive integers only in the f
 total_loan_duration_comma_error: "Please include a comma to separate years and months integers.\n
 Ex. 10 years 3 months is 10,3"
 goodbye: "Thanks for using the mortgage calculator!"
-again?: "Do you want to calculate another loan? (Y to calculate again or N to exit)"
-calculate_again_error: "Type Y to calculate again or N to exit"
+again?: "Do you want to calculate another loan? (yes to calculate again or no to exit)"
+calculate_again_error: "Type yes to calculate again or no to exit"
