@@ -37,13 +37,13 @@ def get_apr
   input
 end
 
-def valid_input_with_comma?(input) # Test
+def valid_input_with_comma?(input)
   input.include?(',')
   input = input.split(',')
   loan_duration_input_check(input) > 1
 end
 
-def valid_input_no_comma?(input) # Test
+def valid_input_no_comma?(input)
   input = input.split
   loan_duration_input_check(input) > 0
 end
@@ -73,7 +73,7 @@ def get_loan_duration
     prompt(MESSAGES['total_loan_duration_integer_error'])
     input = gets.chomp
   end
-  p input.split(',')
+  input.split(',')
 end
 
 def get_mnth_pay(loan_amt, mnth_int_rate, mnth_loan_dura)
