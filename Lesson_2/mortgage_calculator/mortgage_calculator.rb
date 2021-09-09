@@ -9,24 +9,22 @@ def duration_in_months(input)
   (input[0].to_i * 12) + (input[1].to_i)
 end
 
-def input_validate?(input)
+def valid_integer?(input)
   (input.to_i.to_s == input) && (input.to_f > 0.001)
 end
 
-def loan_duration_valid?(a, i)
-  (a[i].to_i.to_s == a[i]) && (a[i].to_i >= 0) && ((a[0].to_i + a[1].to_i) > 0)
+def valid_float?(input)
+  (input.to_f.to_s == input) && (input.to_f > 0.001)
 end
+
+
 
 def get_loan_amount
   input = nil
   prompt(MESSAGES['input_total_loan'])
-  loop do
+  until valid_integer?(input)
     input = gets.chomp
-    if input_validate?(input)
-      break
-    else
-      prompt(MESSAGES['input_total_loan_error'])
-    end
+    prompt(MESSAGES['input_total_loan_error'])
   end
   input.to_i
 end
@@ -34,58 +32,54 @@ end
 def get_apr
   input = nil
   prompt(MESSAGES['input_apr'])
-  loop do
-    input = gets.chomp
-    if (input.include?('.')) && (input.to_f > 0.001)
-      break if input.to_f.to_s == input
-      prompt(MESSAGES['input_apr_error'])
-    elsif input_validate?(input)
-      break
-    else
-      prompt(MESSAGES['input_apr_error'])
-    end
-  end
+  until valid_float?(input) || valid_integer?(input)
+  input = gets.chomp  
+  prompt(MESSAGES['input_apr_error'])
+  end 
   input
 end
 
-def loan_duration_input_check(input, counter)
-  loop do
-    if loan_duration_valid?(input, counter)
-      counter += 1
-      break if counter > 1
-    else
-      prompt(MESSAGES['total_loan_duration_integer_error'])
-      break
-    end
-  end
-  counter
-end
 
 def ask_for_loan_duration
   prompt(MESSAGES['total_loan_duration'])
 end
 
-def get_loan_duration
-  input = nil
+def valid_input_with_comma?(input) # Test
+  input.include?(',')
+  input = input.split(',')
+  loan_duration_input_check(input) > 1
+end
+
+def valid_input_no_comma?(input) # Test
+    input = input.split
+    loan_duration_input_check(input) > 0
+end
+
+def loan_duration_valid?(a, i)
+  (a[i].to_i.to_s == a[i]) && (a[i].to_i >= 0) && ((a[0].to_i + a[1].to_i) > 0)
+end
+
+def loan_duration_input_check(input)
+  inner_input = input
+  counter = 0
   loop do
-    input = gets.chomp
-    if input.include?(',')
-      input = input.split(',')
-      counter = 0
-      counter = loan_duration_input_check(input, counter)
-      next if counter < 2
-    elsif 
-      input = input.split
-      counter = 0
-      counter = loan_duration_input_check(input, counter)
-      next if counter < 1
+    if loan_duration_valid?(inner_input, counter)
+      counter += 1
+      break if counter > 1
     else
-      prompt(MESSAGES['total_loan_duration_comma_error'])
-      next
+      break
     end
-    break
   end
-  input
+  counter 
+end
+
+def get_loan_duration
+  input = gets.chomp
+  until valid_input_with_comma?(input) || valid_input_no_comma?(input)
+    prompt(MESSAGES['total_loan_duration_integer_error'])
+    input = gets.chomp
+  end
+  input = input.split(',') 
 end
 
 def get_mnth_pay(loan_amt, mnth_int_rate, mnth_loan_dura)
@@ -133,7 +127,7 @@ loop do
   clear_screen
   ask_for_loan_duration
   user_input_loan_duration = get_loan_duration
-  clear_screen
+  # clear_screen
   mnth_int_rate = ((user_input_apr.to_f / 100) / 12)
   mnth_loan_dura = duration_in_months(user_input_loan_duration)
   mnth_pay = get_mnth_pay(loan_amount, mnth_int_rate, mnth_loan_dura)
