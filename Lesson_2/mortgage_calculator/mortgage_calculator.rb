@@ -31,9 +31,9 @@ def get_apr
   input = nil
   prompt(MESSAGES['input_apr'])
   until valid_float?(input) || valid_integer?(input)
-  input = gets.chomp  
-  prompt(MESSAGES['input_apr_error'])
-  end 
+    input = gets.chomp
+    prompt(MESSAGES['input_apr_error'])
+  end
   input
 end
 
@@ -44,8 +44,8 @@ def valid_input_with_comma?(input) # Test
 end
 
 def valid_input_no_comma?(input) # Test
-    input = input.split
-    loan_duration_input_check(input) > 0
+  input = input.split
+  loan_duration_input_check(input) > 0
 end
 
 def loan_duration_valid?(a, i)
@@ -63,7 +63,7 @@ def loan_duration_input_check(input)
       break
     end
   end
-  counter 
+  counter
 end
 
 def get_loan_duration
@@ -73,7 +73,7 @@ def get_loan_duration
     prompt(MESSAGES['total_loan_duration_integer_error'])
     input = gets.chomp
   end
-  input = input.split(',') 
+  p input.split(',')
 end
 
 def get_mnth_pay(loan_amt, mnth_int_rate, mnth_loan_dura)
@@ -107,7 +107,7 @@ loop do
   mnth_int_rate = ((user_input_apr.to_f / 100) / 12)
   mnth_loan_dura = duration_in_months(user_input_loan_duration)
   mnth_pay = get_mnth_pay(loan_amount, mnth_int_rate, mnth_loan_dura)
-  
+
   results_message = <<~MSG
   Your monthly payment is $#{mnth_pay.round(2)}
   >>> Your monthly interest rate is #{(mnth_int_rate * 100).round(2)}%
