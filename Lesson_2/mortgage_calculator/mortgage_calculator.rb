@@ -37,15 +37,14 @@ def get_apr
   input
 end
 
-def valid_input_with_comma?(input)
-  input.include?(',')
-  input = input.split(',')
-  loan_duration_input_check(input) > 1
-end
-
-def valid_input_no_comma?(input)
-  input = input.split
-  loan_duration_input_check(input) > 0
+def valid_input_for_loan_duration?(input)
+  if input.include?(',')
+    input = input.split(',')
+    loan_duration_input_check(input) > 1
+  else
+    input = input.split
+    loan_duration_input_check(input) > 0
+  end
 end
 
 def loan_duration_valid?(a, i)
@@ -69,7 +68,7 @@ end
 def get_loan_duration
   prompt(MESSAGES['total_loan_duration'])
   input = gets.chomp
-  until valid_input_with_comma?(input) || valid_input_no_comma?(input)
+  until valid_input_for_loan_duration?(input)
     prompt(MESSAGES['total_loan_duration_integer_error'])
     input = gets.chomp
   end
@@ -118,7 +117,7 @@ loop do
   prompt(display_results(mnth_pay, mnth_int_rate, mnth_loan_dura))
   prompt(MESSAGES['again?'])
   break if calculate_again?.start_with?('n')
-  # clear_screen
+  clear_screen
 end
 
 prompt(MESSAGES['goodbye'])
