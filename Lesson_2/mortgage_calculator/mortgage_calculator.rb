@@ -85,7 +85,7 @@ def calculate_again?
   go_again = gets.chomp.downcase.strip
   until VALID_YES_NO.include?(go_again)
     prompt(MESSAGES['calculate_again_error'])
-    go_again = gets.chomp.downcase
+    go_again = gets.chomp.downcase.strip
   end
   go_again
 end
@@ -118,7 +118,7 @@ loop do
   prompt(display_results(mnth_pay, mnth_int_rate, mnth_loan_dura))
   prompt(MESSAGES['again?'])
   break if calculate_again?.start_with?('n')
-  clear_screen
+  # clear_screen
 end
 
 prompt(MESSAGES['goodbye'])
