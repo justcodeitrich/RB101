@@ -86,7 +86,7 @@ def calculate_again?
     prompt(MESSAGES['calculate_again_error'])
     go_again = gets.chomp.downcase.strip
   end
-  go_again
+  go_again[0] == 'y'
 end
 
 def clear_screen
@@ -116,7 +116,7 @@ loop do
   mnth_pay = get_mnth_pay(loan_amount, mnth_int_rate, mnth_loan_dura)
   prompt(display_results(mnth_pay, mnth_int_rate, mnth_loan_dura))
   prompt(MESSAGES['again?'])
-  break if calculate_again?.start_with?('n')
+  break unless calculate_again?
   clear_screen
 end
 
