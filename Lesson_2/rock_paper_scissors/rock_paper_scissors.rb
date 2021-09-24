@@ -1,4 +1,4 @@
-VALID_CHOICES = ['rock', 'paper', 'scissors', 'spock', 'lizard']
+VALID_CHOICES = ['rock', 'paper', 'scissors', 'spock', 'lizard', 'r','p','sc','sp','l']
 
 def prompt(message)
   puts("=> #{message}")
@@ -28,10 +28,29 @@ def display_results(player, computer)
   end
 end
 
+# Change prompt to show all available options
+# adjust program to accept all available options
+def abbreviated_choice_converter(choice)
+  case 
+    when choice == 'r' 
+      'rock'
+    when choice == 'p' 
+      'paper'
+    when choice == 'sc'  
+      'scissors'
+    when choice == 'l'  
+      'lizard'
+    when choice == 'sp'  
+      'spock'
+    else choice
+  end
+end
+
+
 loop do
   choice = ''
   loop do
-    prompt("Choose one: #{VALID_CHOICES.join(', ')}")
+    prompt("Choose one option with word or designated letter(s): (r)-rock, (p)-paper, (sc)-scissors, (l)-lizard, (sp)-spock")
     choice = gets.chomp
 
     if VALID_CHOICES.include?(choice)
@@ -41,7 +60,8 @@ loop do
     end
   end
 
-  computer_choice = VALID_CHOICES.sample
+  choice = abbreviated_choice_converter(choice)
+  computer_choice = abbreviated_choice_converter(VALID_CHOICES.sample)
 
   prompt("You chose: #{choice}. Computer chose: #{computer_choice}")
 
