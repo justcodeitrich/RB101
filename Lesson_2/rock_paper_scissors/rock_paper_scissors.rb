@@ -16,9 +16,23 @@ end
 def welcome_player
   clear_screen
   prompt(MESSAGES['welcome'])
-  sleep(2)
+  sleep(1)
   prompt(MESSAGES['game_rules'])
   sleep(2)
+end
+
+def get_user_selection
+  input = ''
+  loop do
+    prompt(MESSAGES['ask_user_for_selection'])
+    input = gets.chomp.downcase.strip
+    unless VALID_CHOICES.include?(input)
+      prompt(MESSAGES['invalid_choice_error'])
+      input = gets.chomp.downcase.strip
+    end
+    break
+  end
+  input
 end
 
 def win?(p1, p2)
@@ -85,59 +99,41 @@ def play_again?
   go_again[0] == 'y'
 end
 
-scoreboard = {
-  p1: 0,
-  comp: 0
-}
-
-welcome_player
-
-loop do
-  choice = ''
-
-  loop do
-    prompt(MESSAGES['ask_user_for_selection'])
-    choice = gets.chomp.downcase.strip
-    if VALID_CHOICES.include?(choice)
-      break
-    else
-      prompt(MESSAGES['invalid_choice_error'])
-    end
-  end
-
-  choice = validate_choice(choice)
-  computer_choice = validate_choice(VALID_CHOICES.sample)
-
-  clear_screen
-  prompt("You chose: #{choice}. Computer chose: #{computer_choice}")
-
-  result = display_results(choice, computer_choice)
-
-  prompt(result)
-  prompt(MESSAGES['next_round'])
-
+def next_round?
   until !gets.chomp.nil?
   end
+end
 
-  clear_screen
-  add_score(result, scoreboard)
-
-  prompt("Your score: #{scoreboard[:p1]} | Comp score: #{scoreboard[:comp]}")
-
-  next unless scoreboard[:p1] == 3 || scoreboard[:comp] == 3
-  clear_screen
-
-  declare_winner(scoreboard)
-
-  prompt(MESSAGES['play_again?'])
-  break unless play_again?
-
+loop do
   scoreboard = {
     p1: 0,
     comp: 0
   }
 
-  clear_screen
+  welcome_player
+
+  loop do
+    choice = validate_choice(get_user_selection)
+    computer_choice = validate_choice(VALID_CHOICES.sample)
+    clear_screen
+
+    prompt("You wisely chose: #{choice}. Computer chose: #{computer_choice}")
+    result = display_results(choice, computer_choice)
+    prompt(result)
+    prompt(MESSAGES['next_round'])
+    next_round?
+    clear_screen
+
+    add_score(result, scoreboard)
+    prompt("Your score: #{scoreboard[:p1]} | Comp score: #{scoreboard[:comp]}")
+    next unless scoreboard[:p1] == 3 || scoreboard[:comp] == 3
+    clear_screen
+
+    declare_winner(scoreboard)
+    prompt(MESSAGES['play_again?'])
+    break
+  end
+  break unless play_again?
 end
 
 clear_screen
