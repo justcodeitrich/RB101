@@ -22,11 +22,11 @@ def welcome_player
 end
 
 def get_user_selection
-  input = ''
+  input = ' '
   loop do
     prompt(MESSAGES['ask_user_for_selection'])
     input = gets.chomp.downcase.strip
-    unless VALID_CHOICES.include?(input)
+    until VALID_CHOICES.include?(input)
       prompt(MESSAGES['invalid_choice_error'])
       input = gets.chomp.downcase.strip
     end
