@@ -11,11 +11,17 @@ end
 # scissors beats lizard & paper
 
 def win?(first, second)
-  (first == 'rock' && (second == 'scissors' || second == 'lizard')) ||
-    (first == 'paper' && (second == 'rock' || second == 'spock')) ||
-    (first == 'scissors' && (second == 'paper' || second == 'lizard')) ||
-    (first == 'lizard' && (second == 'spock' || second == 'paper')) ||
-    (first == 'spock' && (second == 'rock' || second == 'scissors'))
+  
+  win_conditions = {
+  spock: ['rock', 'scissors'],
+  lizard: ['spock', 'paper'],
+  rock: ['lizard', 'scissors'],
+  paper: ['rock', 'spock'],
+  scissors: ['lizard', 'paper']
+}
+  first = first.to_sym
+
+  win_conditions[first] && ("#{second}" == win_conditions[first][0] || "#{second}" == win_conditions[first][1])
 end
 
 def display_results(player, computer)
