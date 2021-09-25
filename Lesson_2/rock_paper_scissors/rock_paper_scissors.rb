@@ -1,21 +1,75 @@
-VALID_CHOICES = ['rock', 'paper', 'scissors', 'spock', 'lizard', 'r','p','sc','sp','l']
+require 'yaml'
+MESSAGES = YAML.load_file('text.yml')
+
+VALID_CHOICES = ['rock', 'paper', 'scissors', 'spock', 'lizard',
+                 'r', 'p', 'sc', 'sp', 'l']
+VALID_YES_NO = ['y', 'yes', 'n', 'no']
 
 def prompt(message)
   puts("=> #{message}")
 end
 
-# spock beats rock & scissors
-# lizard beats spock & paper
-# rock beats lizard and scissors
-# paper beats rock & spock
-# scissors beats lizard & paper
+def clear_screen
+  system('clear')
+end
 
-def win?(first, second)
-  (first == 'rock' && (second == 'scissors' || second == 'lizard')) ||
-    (first == 'paper' && (second == 'rock' || second == 'spock')) ||
-    (first == 'scissors' && (second == 'paper' || second == 'lizard')) ||
-    (first == 'lizard' && (second == 'spock' || second == 'paper')) ||
-    (first == 'spock' && (second == 'rock' || second == 'scissors'))
+def welcome_player
+  clear_screen
+  prompt(MESSAGES['welcome'])
+  sleep(1)
+  prompt(MESSAGES['game_rules'])
+  sleep(2)
+end
+
+def get_user_selection
+  input = ' '
+  loop do
+    prompt(MESSAGES['ask_user_for_selection'])
+    input = gets.chomp.downcase.strip
+    until VALID_CHOICES.include?(input)
+      prompt(MESSAGES['invalid_choice_error'])
+      input = gets.chomp.downcase.strip
+    end
+    break
+  end
+  input
+end
+
+def win?(p1, p2)
+  options = {
+    spock: ['rock', 'scissors'],
+    lizard: ['spock', 'paper'],
+    rock: ['lizard', 'scissors'],
+    paper: ['rock', 'spock'],
+    scissors: ['lizard', 'paper']
+  }
+  p1 = p1.to_sym
+
+  options[p1] && (p2.to_s == options[p1][0] || p2.to_s == options[p1][1])
+end
+
+def validate_choice(input)
+  case input
+  when 'r'
+    'rock'
+  when 'p'
+    'paper'
+  when 'sc'
+    'scissors'
+  when 'l'
+    'lizard'
+  when 'sp'
+    'spock'
+  else input
+  end
+end
+
+def add_score(result, scoreboard)
+  if result.include?('You')
+    scoreboard[:p1] += 1
+  elsif result.include?('Computer')
+    scoreboard[:comp] += 1
+  end
 end
 
 def display_results(player, computer)
@@ -28,75 +82,59 @@ def display_results(player, computer)
   end
 end
 
-def abbreviated_choice_converter(choice)
-  case 
-    when choice == 'r' 
-      'rock'
-    when choice == 'p' 
-      'paper'
-    when choice == 'sc'  
-      'scissors'
-    when choice == 'l'  
-      'lizard'
-    when choice == 'sp'  
-      'spock'
-    else choice
+def declare_winner(scoreboard)
+  if scoreboard[:p1] == 3
+    prompt(MESSAGES['player_wins'])
+  else
+    prompt(MESSAGES['computer_wins'])
   end
 end
 
-score_count = {
-  player_score: 0,
-  computer_score: 0
-  }
+def play_again?
+  go_again = gets.chomp.downcase.strip
+  until VALID_YES_NO.include?(go_again)
+    prompt(MESSAGES['invalid_answer'])
+    go_again = gets.chomp.downcase.strip
+  end
+  go_again[0] == 'y'
+end
+
+def next_round?
+  until !gets.chomp.nil?
+  end
+end
 
 loop do
-  choice = ''
-  
+  scoreboard = {
+    p1: 0,
+    comp: 0
+  }
+
+  welcome_player
+
   loop do
-    prompt("Choose one option with word or designated letter(s): (r)-rock, (p)-paper, (sc)-scissors, (l)-lizard, (sp)-spock")
-    choice = gets.chomp
+    choice = validate_choice(get_user_selection)
+    computer_choice = validate_choice(VALID_CHOICES.sample)
+    clear_screen
 
-    if VALID_CHOICES.include?(choice)
-      break
-    else
-      prompt("That's not a valid choice.")
-    end
+    prompt("You wisely chose: #{choice}. Computer chose: #{computer_choice}")
+    result = display_results(choice, computer_choice)
+    prompt(result)
+    prompt(MESSAGES['next_round'])
+    next_round?
+    clear_screen
+
+    add_score(result, scoreboard)
+    prompt("Your score: #{scoreboard[:p1]} | Comp score: #{scoreboard[:comp]}")
+    next unless scoreboard[:p1] == 3 || scoreboard[:comp] == 3
+    clear_screen
+
+    declare_winner(scoreboard)
+    prompt(MESSAGES['play_again?'])
+    break
   end
-
-  choice = abbreviated_choice_converter(choice)
-  computer_choice = abbreviated_choice_converter(VALID_CHOICES.sample)
-  system('clear')
-  prompt("You chose: #{choice}. Computer chose: #{computer_choice}")
-
-  result = display_results(choice, computer_choice)
-  
-  prompt(result)
-  
-  if result.include?('You')
-    score_count[:player_score] += 1
-  elsif result.include?('Computer')
-    score_count[:computer_score] += 1
-  else
-  end
-
-  prompt("Your score: #{score_count[:player_score]} | Computer score: #{score_count[:computer_score]}")
-  next unless score_count[:player_score] == 3 || score_count[:computer_score] == 3
-  system('clear')
-  if score_count[:player_score] == 3
-    prompt("You won three times! You are the champion!")
-  else
-    prompt("The computer won three times! Better luck next time!")
-  end
-
-  prompt("Do you want to play again?")
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
-  
-  score_count = {
-    player_score: 0,
-    computer_score: 0
-    }
-
+  break unless play_again?
 end
 
-prompt("Thank you for playing. Good bye!")
+clear_screen
+prompt(MESSAGES['goodbye'])
