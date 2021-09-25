@@ -1,11 +1,24 @@
 require 'yaml'
 MESSAGES = YAML.load_file('text.yml')
 
-VALID_CHOICES = ['rock', 'paper', 'scissors', 'spock', 'lizard', 'r', 'p', 'sc', 'sp', 'l']
+VALID_CHOICES = ['rock', 'paper', 'scissors', 'spock', 'lizard',
+                 'r', 'p', 'sc', 'sp', 'l']
 VALID_YES_NO = ['y', 'yes', 'n', 'no']
 
 def prompt(message)
   puts("=> #{message}")
+end
+
+def clear_screen
+  system('clear')
+end
+
+def welcome_player
+  clear_screen
+  prompt(MESSAGES['welcome'])
+  sleep(2)
+  prompt(MESSAGES['game_rules'])
+  sleep(2)
 end
 
 def win?(p1, p2)
@@ -21,31 +34,17 @@ def win?(p1, p2)
   options[p1] && (p2.to_s == options[p1][0] || p2.to_s == options[p1][1])
 end
 
-def display_results(player, computer)
-  if win?(player, computer)
-    "You win!"
-  elsif win?(computer, player)
-    "Computer wins!"
-  else
-    "It's a tie!"
-  end
-end
-
-def clear_screen
-  system('clear')
-end
-
 def validate_choice(input)
-  case
-  when input == 'r'
+  case input
+  when 'r'
     'rock'
-  when input == 'p'
+  when 'p'
     'paper'
-  when input == 'sc'
+  when 'sc'
     'scissors'
-  when input == 'l'
+  when 'l'
     'lizard'
-  when input == 'sp'
+  when 'sp'
     'spock'
   else input
   end
@@ -59,20 +58,22 @@ def add_score(result, scoreboard)
   end
 end
 
+def display_results(player, computer)
+  if win?(player, computer)
+    "You win!"
+  elsif win?(computer, player)
+    "Computer wins!"
+  else
+    "It's a tie!"
+  end
+end
+
 def declare_winner(scoreboard)
   if scoreboard[:p1] == 3
     prompt(MESSAGES['player_wins'])
   else
     prompt(MESSAGES['computer_wins'])
   end
-end
-
-def welcome_player
-  clear_screen
-  prompt(MESSAGES['welcome'])
-  sleep(2)
-  prompt(MESSAGES['game_rules'])
-  sleep(2)
 end
 
 def play_again?
@@ -121,7 +122,7 @@ loop do
   clear_screen
   add_score(result, scoreboard)
 
-  prompt("Your score: #{scoreboard[:p1]} | Computer score: #{scoreboard[:comp]}")
+  prompt("Your score: #{scoreboard[:p1]} | Comp score: #{scoreboard[:comp]}")
 
   next unless scoreboard[:p1] == 3 || scoreboard[:comp] == 3
   clear_screen
