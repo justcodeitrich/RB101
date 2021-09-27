@@ -14,7 +14,7 @@ OPTIONS = {
   'paper' => ['rock', 'spock'],
   'scissors' => ['lizard', 'paper']
 }
-WINNING_SCORE = 3
+WIN_SCORE = 3
 VALID_YES_NO = ['y', 'yes', 'n', 'no']
 
 def prompt(message)
@@ -86,7 +86,7 @@ def display_results(player, computer)
 end
 
 def declare_winner(scoreboard)
-  if scoreboard[:p1] == WINNING_SCORE
+  if scoreboard[:p1] == WIN_SCORE
     prompt(MESSAGES['player_wins'])
   else
     prompt(MESSAGES['computer_wins'])
@@ -129,7 +129,7 @@ loop do
 
     add_score(result, scoreboard)
     prompt("Your score: #{scoreboard[:p1]} | Comp score: #{scoreboard[:comp]}")
-    next unless scoreboard[:p1] == WINNING_SCORE || scoreboard[:comp] == WINNING_SCORE
+    next unless scoreboard[:p1] == WIN_SCORE || scoreboard[:comp] == WIN_SCORE
     clear_screen
 
     declare_winner(scoreboard)
