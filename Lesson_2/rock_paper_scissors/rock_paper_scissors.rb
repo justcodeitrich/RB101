@@ -1,6 +1,5 @@
 require 'yaml'
 MESSAGES = YAML.load_file('text.yml')
-
 VALID_CHOICES = {
   'r' => 'rock',
   'p' => 'paper',
@@ -8,6 +7,14 @@ VALID_CHOICES = {
   'sp' => 'spock',
   'l' => 'lizard'
 }
+OPTIONS = {
+  'spock' => ['rock', 'scissors'],
+  'lizard' => ['spock', 'paper'],
+  'rock' => ['lizard', 'scissors'],
+  'paper' => ['rock', 'spock'],
+  'scissors' => ['lizard', 'paper']
+}
+WINNING_SCORE = 3
 VALID_YES_NO = ['y', 'yes', 'n', 'no']
 
 def prompt(message)
@@ -41,16 +48,7 @@ def get_user_selection
 end
 
 def win?(p1, p2)
-  options = {
-    spock: ['rock', 'scissors'],
-    lizard: ['spock', 'paper'],
-    rock: ['lizard', 'scissors'],
-    paper: ['rock', 'spock'],
-    scissors: ['lizard', 'paper']
-  }
-  p1 = p1.to_sym
-
-  options[p1] && (p2.to_s == options[p1][0] || p2.to_s == options[p1][1])
+  OPTIONS[p1].include?(p2)
 end
 
 def validate_choice(input)
@@ -88,7 +86,7 @@ def display_results(player, computer)
 end
 
 def declare_winner(scoreboard)
-  if scoreboard[:p1] == 3
+  if scoreboard[:p1] == WINNING_SCORE
     prompt(MESSAGES['player_wins'])
   else
     prompt(MESSAGES['computer_wins'])
@@ -131,7 +129,7 @@ loop do
 
     add_score(result, scoreboard)
     prompt("Your score: #{scoreboard[:p1]} | Comp score: #{scoreboard[:comp]}")
-    next unless scoreboard[:p1] == 3 || scoreboard[:comp] == 3
+    next unless scoreboard[:p1] == WINNING_SCORE || scoreboard[:comp] == WINNING_SCORE
     clear_screen
 
     declare_winner(scoreboard)
