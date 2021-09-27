@@ -1,8 +1,13 @@
 require 'yaml'
 MESSAGES = YAML.load_file('text.yml')
 
-VALID_CHOICES = ['rock', 'paper', 'scissors', 'spock', 'lizard',
-                 'r', 'p', 'sc', 'sp', 'l']
+VALID_CHOICES = {
+  'r' => 'rock',
+  'p' => 'paper',
+  'sc' => 'scissors',
+  'sp' => 'spock',
+  'l' => 'lizard'
+}
 VALID_YES_NO = ['y', 'yes', 'n', 'no']
 
 def prompt(message)
@@ -26,7 +31,7 @@ def get_user_selection
   loop do
     prompt(MESSAGES['ask_user_for_selection'])
     input = gets.chomp.downcase.strip
-    until VALID_CHOICES.include?(input)
+    until VALID_CHOICES.flatten.include?(input)
       prompt(MESSAGES['invalid_choice_error'])
       input = gets.chomp.downcase.strip
     end
@@ -114,7 +119,7 @@ loop do
 
   loop do
     choice = validate_choice(get_user_selection)
-    computer_choice = validate_choice(VALID_CHOICES.sample)
+    computer_choice = validate_choice(VALID_CHOICES.values.sample)
     clear_screen
 
     prompt("You wisely chose: #{choice}. Computer chose: #{computer_choice}")
