@@ -1,8 +1,20 @@
 require 'yaml'
 MESSAGES = YAML.load_file('text.yml')
-
-VALID_CHOICES = ['rock', 'paper', 'scissors', 'spock', 'lizard',
-                 'r', 'p', 'sc', 'sp', 'l']
+VALID_CHOICES = {
+  'r' => 'rock',
+  'p' => 'paper',
+  'sc' => 'scissors',
+  'sp' => 'spock',
+  'l' => 'lizard'
+}
+OPTIONS = {
+  'spock' => ['rock', 'scissors'],
+  'lizard' => ['spock', 'paper'],
+  'rock' => ['lizard', 'scissors'],
+  'paper' => ['rock', 'spock'],
+  'scissors' => ['lizard', 'paper']
+}
+WIN_SCORE = 3
 VALID_YES_NO = ['y', 'yes', 'n', 'no']
 
 def prompt(message)
@@ -26,7 +38,7 @@ def get_user_selection
   loop do
     prompt(MESSAGES['ask_user_for_selection'])
     input = gets.chomp.downcase.strip
-    until VALID_CHOICES.include?(input)
+    until VALID_CHOICES.flatten.include?(input)
       prompt(MESSAGES['invalid_choice_error'])
       input = gets.chomp.downcase.strip
     end
@@ -36,16 +48,7 @@ def get_user_selection
 end
 
 def win?(p1, p2)
-  options = {
-    spock: ['rock', 'scissors'],
-    lizard: ['spock', 'paper'],
-    rock: ['lizard', 'scissors'],
-    paper: ['rock', 'spock'],
-    scissors: ['lizard', 'paper']
-  }
-  p1 = p1.to_sym
-
-  options[p1] && (p2.to_s == options[p1][0] || p2.to_s == options[p1][1])
+  OPTIONS[p1].include?(p2)
 end
 
 def validate_choice(input)
@@ -83,7 +86,7 @@ def display_results(player, computer)
 end
 
 def declare_winner(scoreboard)
-  if scoreboard[:p1] == 3
+  if scoreboard[:p1] == WIN_SCORE
     prompt(MESSAGES['player_wins'])
   else
     prompt(MESSAGES['computer_wins'])
@@ -114,7 +117,7 @@ loop do
 
   loop do
     choice = validate_choice(get_user_selection)
-    computer_choice = validate_choice(VALID_CHOICES.sample)
+    computer_choice = validate_choice(VALID_CHOICES.values.sample)
     clear_screen
 
     prompt("You wisely chose: #{choice}. Computer chose: #{computer_choice}")
@@ -126,7 +129,7 @@ loop do
 
     add_score(result, scoreboard)
     prompt("Your score: #{scoreboard[:p1]} | Comp score: #{scoreboard[:comp]}")
-    next unless scoreboard[:p1] == 3 || scoreboard[:comp] == 3
+    next unless scoreboard[:p1] == WIN_SCORE || scoreboard[:comp] == WIN_SCORE
     clear_screen
 
     declare_winner(scoreboard)
