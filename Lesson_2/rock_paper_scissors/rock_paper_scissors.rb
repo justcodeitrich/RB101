@@ -52,19 +52,11 @@ def win?(p1, p2)
 end
 
 def validate_choice(input)
-  case input
-  when 'r'
-    'rock'
-  when 'p'
-    'paper'
-  when 'sc'
-    'scissors'
-  when 'l'
-    'lizard'
-  when 'sp'
-    'spock'
-  else input
-  end
+  if VALID_CHOICES.keys.include?(input)
+    VALID_CHOICES[input]
+  else
+    input
+  end 
 end
 
 def add_score(result, scoreboard)
