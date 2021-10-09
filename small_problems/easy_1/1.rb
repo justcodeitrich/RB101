@@ -1,6 +1,13 @@
-# Difference between file::path and file#path?
-# file ::path - public class method - returns the string representation of the path
-# file #path - public instance method - returns the pathname used to create file as a string. Does not normalize the name.
+#two arguments (String, positive integer)
+
+def repeat(string,integer)
+  integer.times {|x| puts string }
+end
+
+repeat("hi",10)
 
 
-
+def repeat(string,integer)
+  puts (string + "\n") * integer
+end
+repeat("hi",10)
