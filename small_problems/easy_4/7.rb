@@ -80,3 +80,6 @@ def string_to_integer(string)
 end
 
 string_to_integer('1234')
+
+# I didnt need inject in the end
+# I got using the hash to convert strings to integers right
