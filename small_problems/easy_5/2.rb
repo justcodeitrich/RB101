@@ -48,9 +48,23 @@ minutes.prepend("0") if minutes.length < 2
 
 return "#{hours}:#{minutes}"
 end
+#What dont I understand?
+# I don't understand how -3 / 1440 can result in [-1,1437]
+# the quotient is -0.0020833333.
+# Answer: the quotient is -1 because -3/1440.floor is -0.0020833 rounded to the closest integer less than itself
 
 time_of_day(0) == "00:00" #true
 time_of_day(-3) == "23:57"
+-3.divmod(1440) #=> using a calculator this results in -0.002
+days = -1
+minutes = 1437
+
+1437.divmod(60)
+hours = 23
+minutes = 57
+
+
+
 time_of_day(35) == "00:35" #true
 time_of_day(-1437) == "00:03" 
 time_of_day(3000) == "02:00" #true
