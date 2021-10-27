@@ -1,0 +1,17 @@
+# comparing the return values of select and map when the returned block value is nil
+
+['a', 'b', 'c'].select do |item|
+  puts item
+end
+# => []
+
+
+['a', 'b', 'c'].map do |item|
+  puts item
+end
+# => [nil,nil,nil]
+
+['a', 'b', 'c'].map do |item|
+  # Nothing in the block
+end
+# => [nil,nil,nil]
