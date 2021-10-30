@@ -21,3 +21,11 @@ munsters = {
   "Marilyn" => { "age" => 23, "gender" => "female"}
 }
 
+
+#LS solution
+total_male_age = 0
+munsters.each_value do |details|
+  total_male_age += details["age"] if details["gender"] == "male"
+end
+
+total_male_age # => 444
