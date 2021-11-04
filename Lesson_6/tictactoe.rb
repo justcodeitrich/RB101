@@ -14,8 +14,6 @@ end
 
 # rubocop: disable Metrics/AbcSize
 def display_board(brd)
-  system 'clear'
-  puts "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -42,19 +40,6 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
-# original code
-# def player_places_piece!(brd)
-#   square = ''
-#   loop do
-#     prompt "Choose a square (#{empty_squares(brd).join(', ')}):"
-#     square = gets.chomp.to_i
-#     break if empty_squares(brd).include?(square)
-#     prompt "Sorry, that's not a valid choice."
-#   end
-#   brd[square] = PLAYER_MARKER
-# end
-
-# test code
 def player_places_piece!(brd)
   square = ''
   loop do
@@ -66,28 +51,6 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-# write a method joinor that takes three arguments: 
-# an array, a separator between the elements, and a final separator 'and'
-# Why? - to improve the readability of the prompt asking user for a square choice
-
-# input: array
-# output: string
-
-# take the passed in array, apply join(arg2) to it
-# loop through the string backwards, when it finds the first instance of arg2, replace it with arg3
-  # looping through message
-  # set counter to -1 and subtract -1 through each element
-  # once it reaches the first instance of the separator, use []= to replace that index with arg3
-  # break once it reaches the separator.
-# return the final string
-# edge case: if message[counter] == separator  
-  #   when separator argument has a space like ", " 
-  #   message[counter] is assigned to ',' and separator is ', '
-  #   this creates an infinite loop because ',' and ', ' will never equal each other
-  # solution: let the argument have a space, use String#strip for the comparison line
-# edge case: when 8 of the 9 segments are filled in, the last prompt doesnt appear
-  # it should give the option for the last remaining square
-  # solution: return array[0] if array.length == 1 aka get out of method if only 1 number left
 def joinor(array,separator,final_separator)
   return array[0] if array.length == 1
   message = array.join(separator)
@@ -118,15 +81,6 @@ end
 
 def detect_winner(brd)
   WINNING_LINES.each do |line|
-    # if brd[line[0]] == PLAYER_MARKER &&
-    #    brd[line[1]] == PLAYER_MARKER &&
-    #    brd[line[2]] == PLAYER_MARKER
-    #   return 'Player'
-    # elsif brd[line[0]] == COMPUTER_MARKER &&
-    #       brd[line[1]] == COMPUTER_MARKER &&
-    #       brd[line[2]] == COMPUTER_MARKER
-    #   return 'Computer'
-    # end
 
     if brd.values_at(*line).count(PLAYER_MARKER) == 3
       return 'Player'
@@ -137,28 +91,74 @@ def detect_winner(brd)
   nil
 end
 
+
+# objective: keep score of how many times the player and computer win. First to 5 wins
+
+# need a container to hold player and computer scores
+  # use a hash
+# add a loop that surrounds the main gameplay 
+# at end of each game, add a point if there is a winner and check to see if player or computer reached 5
+  # use the return value of detect_winner(brd) - 'Player' or 'Computer' to add points to scoreboard.
+# ---
+
+def initialize_scoreboard
+  scoreboard = {
+    "Player" => 0,
+    "Computer" => 0
+}
+end
+
+def update_scoreboard(winner,scoreboard)
+  scoreboard[winner] += 1 if scoreboard.include?(winner)
+end
+
+def won_five_games?(scoreboard)
+  scoreboard.values.include?(5)
+end
+
+
 loop do
-  board = initialize_board
+  system 'clear'
+  scoreboard = initialize_scoreboard
 
   loop do
+    board = initialize_board
+
+    loop do
+      prompt "First to five wins! You: #{scoreboard['Player']} | Computer: #{scoreboard['Computer']}"
+      prompt "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
+      
+      display_board(board)
+
+      player_places_piece!(board)
+      system 'clear'
+      break if someone_won?(board) || board_full?(board)
+
+      computer_places_piece!(board)
+      display_board(board)
+      system 'clear'
+      break if someone_won?(board) || board_full?(board)
+    end
+    
+    prompt "First to five wins! You: #{scoreboard['Player']} | Computer: #{scoreboard['Computer']}"
+    prompt "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
+    
     display_board(board)
 
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+    if someone_won?(board)
+      prompt "#{detect_winner(board)} won!"
+    else
+      prompt "It's a tie!"
+    end
 
-    computer_places_piece!(board)
-    display_board(board)
-    break if someone_won?(board) || board_full?(board)
+    update_scoreboard(detect_winner(board),scoreboard)
+    sleep 2
+    system 'clear'
+    
+    break puts "#{detect_winner(board)} won five games!" if won_five_games?(scoreboard)
+
   end
-
-  display_board(board)
-
-  if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
-  else
-    prompt "It's a tie!"
-  end
-
+    
   prompt "Play again? (y or n)"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
