@@ -4,9 +4,6 @@ INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 
-WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
-                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
-                [[1, 5, 9], [3, 5, 7]] # diagonals
 
 def prompt(msg)
   puts "#=> #{msg}"
@@ -66,10 +63,71 @@ def joinor(array,separator,final_separator)
   message
 end
 
+WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
+                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
+                [[1, 5, 9], [3, 5, 7]] # diagonals
+
+DEFENSE_LINES = { 
+  [1,2] => 3, 
+  [2,3] => 1, 
+  [4,5] => 6, 
+  [5,6] => 4, 
+  [7,8] => 9, 
+  [8,9] => 7, 
+  [1,4] => 7, 
+  [4,7] => 1, 
+  [2,5] => 8, 
+  [5,8] => 2, 
+  [3,6] => 9, 
+  [6,9] => 3, 
+  [1,5] => 9, 
+  [5,9] => 1, 
+  [3,5] => 7,
+  [5,7] => 3  
+}
+
+
+# take double marked squares and find the value in DEFENSE_LINES hash
+# check to see if that value is included in empty_squares return value.
+# If yes, then computer marker is assigned to that value
+# if not, go to next double marked square
+
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  square = ''
+  double_marked_squares = DEFENSE_LINES.select do |line|
+    brd.values_at(line[0],line[1]).count(PLAYER_MARKER) == 2
+  end
+  if double_marked_squares.length > 0
+    
+    double_marked_squares.keys.each do |pair_value|
+      value = DEFENSE_LINES[pair_value]
+      if empty_squares(brd).include?(value)
+        square = value
+      end
+      # binding.pry
+    end
+  else
+    square = empty_squares(brd).sample
+  end
+    # binding.pry
+
   brd[square] = COMPUTER_MARKER
 end
+
+# Objective: Make the computer defensive
+# If there are 2 squares marked by X, then it will mark the 3rd square
+
+# I can use the existing computer_places_piece! method to write this code
+# as of now computer picks any square that is empty
+# I can use the WINNING_LINES constant.
+  # if two of the three are 'X', then place Computer Marker into empty space
+  # How can I select the empty square only?
+    # once I find two boxes that contain the 'X' only
+    # Use the sub-array in the defense line to look up a sub-array in winning-lines
+  ### I could use a hash instead. I'm having a hard time figuring out how I could find the overlapping in WINNING_LINES and DEFENSE_LINES
+    # I think it would require nesting Array#select and combining with Array#all?
+
+# computer piece must be placed on empty AND next to two 'X'
 
 def board_full?(brd)
   empty_squares(brd).empty?
@@ -91,16 +149,6 @@ def detect_winner(brd)
   nil
 end
 
-
-# objective: keep score of how many times the player and computer win. First to 5 wins
-
-# need a container to hold player and computer scores
-  # use a hash
-# add a loop that surrounds the main gameplay 
-# at end of each game, add a point if there is a winner and check to see if player or computer reached 5
-  # use the return value of detect_winner(brd) - 'Player' or 'Computer' to add points to scoreboard.
-# ---
-
 def initialize_scoreboard
   scoreboard = {
     "Player" => 0,
@@ -117,8 +165,9 @@ def won_five_games?(scoreboard)
 end
 
 
+
 loop do
-  system 'clear'
+  # system 'clear'
   scoreboard = initialize_scoreboard
 
   loop do
@@ -131,12 +180,12 @@ loop do
       display_board(board)
 
       player_places_piece!(board)
-      system 'clear'
+      # system 'clear'
       break if someone_won?(board) || board_full?(board)
 
       computer_places_piece!(board)
       display_board(board)
-      system 'clear'
+      # system 'clear'
       break if someone_won?(board) || board_full?(board)
     end
     
@@ -153,7 +202,7 @@ loop do
 
     update_scoreboard(detect_winner(board),scoreboard)
     sleep 2
-    system 'clear'
+    # system 'clear'
     
     break puts "#{detect_winner(board)} won five games!" if won_five_games?(scoreboard)
 
