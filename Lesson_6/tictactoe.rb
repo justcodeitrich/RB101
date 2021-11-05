@@ -86,48 +86,65 @@ DEFENSE_LINES = {
   [5,7] => 3  
 }
 
-
-# take double marked squares and find the value in DEFENSE_LINES hash
-# check to see if that value is included in empty_squares return value.
-# If yes, then computer marker is assigned to that value
-# if not, go to next double marked square
-
 def computer_places_piece!(brd)
-  square = ''
-  double_marked_squares = DEFENSE_LINES.select do |line|
+  square = nil
+
+  player_pairs = DEFENSE_LINES.select do |line|
     brd.values_at(line[0],line[1]).count(PLAYER_MARKER) == 2
   end
-  if double_marked_squares.length > 0
-    
-    double_marked_squares.keys.each do |pair_value|
+
+  computer_pairs = DEFENSE_LINES.select do |line|
+    brd.values_at(line[0],line[1]).count(COMPUTER_MARKER) == 2
+  end
+
+  if player_pairs.empty? && computer_pairs.empty? # select randomly if both player & computer have no pairs
+    square = empty_squares(brd).sample
+    # puts "from both empty"
+    return brd[square] = COMPUTER_MARKER
+  end
+
+  # puts "player pairs #{player_pairs}"
+  # puts "computer pairs #{computer_pairs}"
+  # puts "empty squares #{empty_squares(brd)}"
+
+  # OFFENSE first
+  if computer_pairs.length > 0
+    # puts "Went Offense"
+    computer_pairs.keys.each do |pair_value|
       value = DEFENSE_LINES[pair_value]
       if empty_squares(brd).include?(value)
-        square = value
+        return brd[value] = COMPUTER_MARKER
+        # puts "Returned out from empty_squares"
       end
-      # binding.pry
     end
-  else
-    square = empty_squares(brd).sample
   end
-    # binding.pry
 
+  # DEFENSE second
+  if player_pairs.length > 0
+    # puts "Went Defense"
+    player_pairs.keys.each do |pair_value|
+      value = DEFENSE_LINES[pair_value]
+      if empty_squares(brd).include?(value)
+        # puts "computer choice inside: #{value}"
+        return brd[value] = COMPUTER_MARKER
+        # puts "Picked from DEFENSE empty_squares"
+      end
+    end
+  end
+
+  square = empty_squares(brd).sample
+  # puts "computer choice random: #{square}"
   brd[square] = COMPUTER_MARKER
 end
 
-# Objective: Make the computer defensive
-# If there are 2 squares marked by X, then it will mark the 3rd square
+# add-on to the previous defense to make the computer offensive too
+# if the computer attacks, then it wont defend. It should attack once it considers the player's recently played moved
+# aka defend first, if no impending risk then attack.
+# bug - after the 3rd player input, computer stops placing pieces and player keeps going
+  # this only happens when a tie is imminent with 4 player pieces and 3 computer pieces.
+  # It's not registering that it can make a move
+# What happens when player places piece down on a square and the computer wants to put its piece there to complete a row?
 
-# I can use the existing computer_places_piece! method to write this code
-# as of now computer picks any square that is empty
-# I can use the WINNING_LINES constant.
-  # if two of the three are 'X', then place Computer Marker into empty space
-  # How can I select the empty square only?
-    # once I find two boxes that contain the 'X' only
-    # Use the sub-array in the defense line to look up a sub-array in winning-lines
-  ### I could use a hash instead. I'm having a hard time figuring out how I could find the overlapping in WINNING_LINES and DEFENSE_LINES
-    # I think it would require nesting Array#select and combining with Array#all?
-
-# computer piece must be placed on empty AND next to two 'X'
 
 def board_full?(brd)
   empty_squares(brd).empty?
