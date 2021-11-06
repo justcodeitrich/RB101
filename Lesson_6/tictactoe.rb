@@ -110,40 +110,50 @@ def computer_places_piece!(brd)
 
   # OFFENSE first
   square = comp_offense_defense(computer_pairs,brd,square)
-  p square
+
   # DEFENSE second
   square = comp_offense_defense(player_pairs,brd,square)
-  p square
+
   # Pick 5 
   square = pick_square_5(brd,square)
-  p square
+
   # Pick randomly
   square = empty_squares(brd).sample if square == nil
-  p square
 
   brd[square] = COMPUTER_MARKER
 end
 
-# objective: have computer pick square 5 if it's available
-# pick offensive move, then defensive move, then square 5, then random
-# sub-project: square 5
-  # write a method that has computer place piece on square 5 if it is available
-  def pick_square_5(brd,sqr)
-    if empty_squares(brd).include?(5) && sqr == nil
-      5
-    else 
-      sqr
-    end
+def pick_square_5(brd,sqr)
+  if empty_squares(brd).include?(5) && sqr == nil
+    5
+  else 
+    sqr
   end
+end
 
-  # refactor the offense and defense moves into methods
-  # use a turn counter to increment each turn
+# Ask user who should go first
+def who_goes_first
+  prompt "Who should go first? (Type P for player or C for computer)"
+  answer = gets.chomp.downcase
+end
+# Enable computer to be able to go first
+  # depending on the C or P answer, choose player_places_piece! or computer_places_piece!
 
-# ultimately the computer_places_piece! is to mutate the board hash that gets passed in
-# brd [square] = COMPUTER_MARKER
-# therefore the square value needs to be able to move through each helper method
-# offense, defense, square 5, random
+def next_turn(turn)
+  if turn == 'c'
+    turn = 'p'
+  else
+    turn = 'c'
+  end
+end
 
+def whos_turn(turn,brd)
+  if turn == 'c'
+    computer_places_piece!(brd)
+  else 
+    player_places_piece!(brd)
+  end
+end
 
 def board_full?(brd)
   empty_squares(brd).empty?
@@ -183,26 +193,27 @@ end
 
 
 loop do
-  # system 'clear'
+  system 'clear'
   scoreboard = initialize_scoreboard
-
   loop do
-    board = initialize_board
+    
+    prompt "First to five wins! You: #{scoreboard['Player']} | Computer: #{scoreboard['Computer']}"
+    turn = who_goes_first
+    system 'clear'
+    board = initialize_board 
 
     loop do
+
       prompt "First to five wins! You: #{scoreboard['Player']} | Computer: #{scoreboard['Computer']}"
       prompt "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
+      display_board(board)
+      whos_turn(turn,board)
       
-      display_board(board)
-
-      player_places_piece!(board)
-      # system 'clear'
+      turn = next_turn(turn)
+      
+      system 'clear'
       break if someone_won?(board) || board_full?(board)
-
-      computer_places_piece!(board)
-      display_board(board)
-      # system 'clear'
-      break if someone_won?(board) || board_full?(board)
+      
     end
     
     prompt "First to five wins! You: #{scoreboard['Player']} | Computer: #{scoreboard['Computer']}"
@@ -218,7 +229,7 @@ loop do
 
     update_scoreboard(detect_winner(board),scoreboard)
     sleep 2
-    # system 'clear'
+    system 'clear'
     
     break puts "#{detect_winner(board)} won five games!" if won_five_games?(scoreboard)
 
