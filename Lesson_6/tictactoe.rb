@@ -131,13 +131,17 @@ def pick_square_5(brd,sqr)
   end
 end
 
-# Ask user who should go first
+
 def who_goes_first
-  prompt "Who should go first? (Type P for player or C for computer)"
-  answer = gets.chomp.downcase
+  prompt "Who should decide who goes first - you or the computer? (Type P for player or C for computer)"
+  choice = gets.chomp.downcase
+  if choice == 'c'
+    return ['c','p'].sample
+  else
+    prompt "Who should go first? (Type P for player or C for computer)"
+    answer = gets.chomp.downcase
+  end
 end
-# Enable computer to be able to go first
-  # depending on the C or P answer, choose player_places_piece! or computer_places_piece!
 
 def next_turn(turn)
   if turn == 'c'
@@ -196,7 +200,7 @@ loop do
   system 'clear'
   scoreboard = initialize_scoreboard
   loop do
-    
+
     prompt "First to five wins! You: #{scoreboard['Player']} | Computer: #{scoreboard['Computer']}"
     turn = who_goes_first
     system 'clear'
