@@ -98,17 +98,17 @@ def comp_offense_defense(pairs, brd, sqr)
   sqr
 end
 
+def piece_pairs(brd, marker)
+  ACTION_PAIRS.select do |line|
+    brd.values_at(line[0], line[1]).count(marker) == 2
+  end
+end
+
 def computer_places_piece!(brd)
   square = nil
+  player_pairs = piece_pairs(brd, PLAYER_MARKER)
+  computer_pairs = piece_pairs(brd, COMPUTER_MARKER)
 
-  player_pairs = ACTION_PAIRS.select do |line|
-    brd.values_at(line[0], line[1]).count(PLAYER_MARKER) == 2
-  end
-
-  computer_pairs = ACTION_PAIRS.select do |line|
-    brd.values_at(line[0], line[1]).count(COMPUTER_MARKER) == 2
-  end
-  # I can make a case statement from this
   # OFFENSE first
   square = comp_offense_defense(computer_pairs, brd, square)
 
