@@ -131,28 +131,27 @@ def pick_square_5(brd,sqr)
   end
 end
 
-
 def who_goes_first
   prompt "Who should decide who goes first - you or the computer? (Type P for player or C for computer)"
-  choice = gets.chomp.downcase
+  choice = gets.strip.downcase
   if choice == 'c'
-    return ['c','p'].sample
+    ['c','p'].sample
   else
     prompt "Who should go first? (Type P for player or C for computer)"
-    answer = gets.chomp.downcase
+    answer = gets.strip.downcase
   end
 end
 
-def next_turn(turn)
-  if turn == 'c'
-    turn = 'p'
+def alternate_player(current_player)
+  if current_player == 'c'
+    current_player = 'p'
   else
-    turn = 'c'
+    current_player = 'c'
   end
 end
 
-def whos_turn(turn,brd)
-  if turn == 'c'
+def place_piece!(brd,current_player)
+  if current_player == 'c'
     computer_places_piece!(brd)
   else 
     player_places_piece!(brd)
@@ -194,7 +193,18 @@ def won_five_games?(scoreboard)
   scoreboard.values.include?(5)
 end
 
+# objective: create two methods that refactors the gameplay loop
+  # 1) place_piece! - generic method that places piece based on current player
+  # 2) alternate_player - used to switch back and forth between player and computer and assign the variable current_player to the value
 
+# I actually already create this. I just need to change the names around
+# template
+  # loop do
+    # display_board(board)
+    # place_piece!(board, current_player)
+    # current_player = alternate_player(current_player)
+    # break if someone_won?(board) || board_full?(board)
+  # end
 
 loop do
   system 'clear'
@@ -202,7 +212,7 @@ loop do
   loop do
 
     prompt "First to five wins! You: #{scoreboard['Player']} | Computer: #{scoreboard['Computer']}"
-    turn = who_goes_first
+    current_player = who_goes_first
     system 'clear'
     board = initialize_board 
 
@@ -211,9 +221,9 @@ loop do
       prompt "First to five wins! You: #{scoreboard['Player']} | Computer: #{scoreboard['Computer']}"
       prompt "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
       display_board(board)
-      whos_turn(turn,board)
+      place_piece!(board,current_player)
       
-      turn = next_turn(turn)
+      current_player = alternate_player(current_player)
       
       system 'clear'
       break if someone_won?(board) || board_full?(board)
