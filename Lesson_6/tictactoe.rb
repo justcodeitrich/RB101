@@ -1,12 +1,33 @@
 require 'yaml'
-require 'pry'
 
 MESSAGES = YAML.load_file('tictactoe_yaml.yml')
-
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 VALID_YES_NO = ['y', 'yes', 'n', 'no']
+
+WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
+                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
+                [[1, 5, 9], [3, 5, 7]] # diagonals
+
+ACTION_PAIRS = {
+  [1, 2] => 3,
+  [2, 3] => 1,
+  [4, 5] => 6,
+  [5, 6] => 4,
+  [7, 8] => 9,
+  [8, 9] => 7,
+  [1, 4] => 7,
+  [4, 7] => 1,
+  [2, 5] => 8,
+  [5, 8] => 2,
+  [3, 6] => 9,
+  [6, 9] => 3,
+  [1, 5] => 9,
+  [5, 9] => 1,
+  [3, 5] => 7,
+  [5, 7] => 3
+}
 
 def prompt(msg)
   puts "#=> #{msg}"
@@ -36,8 +57,44 @@ def initialize_board
   new_board
 end
 
+def initialize_scoreboard
+  {
+    "Player" => 0,
+    "Computer" => 0
+  }
+end
+
 def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
+end
+
+def decide_first_move
+  prompt MESSAGES['decide_who_picks_order']
+  choice = player_or_computer?
+  choice == 'c' ? ['c', 'p'].sample : who_goes_first
+end
+
+def who_goes_first
+  prompt MESSAGES['who_goes_first?']
+  player_or_computer?
+end
+
+def player_or_computer?
+  choice = ''
+  loop do
+    choice = gets.strip.downcase
+    break if choice == 'c' || choice == 'p'
+    prompt MESSAGES['invalid_input']
+  end
+  choice
+end
+
+def alternate_player(cur_player)
+  cur_player == 'c' ? 'p' : 'c'
+end
+
+def place_piece!(brd, cur_player)
+  cur_player == 'c' ? computer_places_piece!(brd) : player_places_piece!(brd)
 end
 
 def player_places_piece!(brd)
@@ -46,7 +103,7 @@ def player_places_piece!(brd)
     prompt "Choose a square (#{joinor(empty_squares(brd), ', ', 'or')}):"
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
-    prompt "Sorry, that's not a valid choice."
+    prompt MESSAGES['invalid_input']
   end
   brd[square] = PLAYER_MARKER
 end
@@ -66,28 +123,11 @@ def joinor(array, separator, final_separator)
   message
 end
 
-WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
-                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
-                [[1, 5, 9], [3, 5, 7]] # diagonals
-
-ACTION_PAIRS = {
-  [1, 2] => 3,
-  [2, 3] => 1,
-  [4, 5] => 6,
-  [5, 6] => 4,
-  [7, 8] => 9,
-  [8, 9] => 7,
-  [1, 4] => 7,
-  [4, 7] => 1,
-  [2, 5] => 8,
-  [5, 8] => 2,
-  [3, 6] => 9,
-  [6, 9] => 3,
-  [1, 5] => 9,
-  [5, 9] => 1,
-  [3, 5] => 7,
-  [5, 7] => 3
-}
+def piece_pairs(brd, marker)
+  ACTION_PAIRS.select do |line|
+    brd.values_at(line[0], line[1]).count(marker) == 2
+  end
+end
 
 def comp_offense_defense(pairs, brd, sqr)
   if pairs.length > 0 && sqr.nil?
@@ -99,10 +139,8 @@ def comp_offense_defense(pairs, brd, sqr)
   sqr
 end
 
-def piece_pairs(brd, marker)
-  ACTION_PAIRS.select do |line|
-    brd.values_at(line[0], line[1]).count(marker) == 2
-  end
+def pick_square_5(brd, sqr)
+  empty_squares(brd).include?(5) && sqr.nil? ? 5 : sqr
 end
 
 def computer_places_piece!(brd)
@@ -125,52 +163,6 @@ def computer_places_piece!(brd)
   brd[square] = COMPUTER_MARKER
 end
 
-def pick_square_5(brd, sqr)
-  if empty_squares(brd).include?(5) && sqr.nil?
-    5
-  else
-    sqr
-  end
-end
-
-def decide_first_move
-  choice = ''
-  loop do
-    prompt MESSAGES['decide_who_picks_order']
-    choice = gets.strip.downcase
-    break if choice == 'c' || choice == 'p'
-    prompt MESSAGES['invalid_input']
-  end
-  choice == 'c' ? ['c', 'p'].sample : who_goes_first
-end
-
-def who_goes_first
-  choice = ''
-  loop do
-    prompt MESSAGES['who_goes_first?']
-    choice = gets.strip.downcase
-    break if choice == 'c' || choice == 'p'
-    prompt MESSAGES['invalid_input']
-  end
-  choice
-end
-
-def alternate_player(current_player)
-  if current_player == 'c'
-    'p'
-  else
-    'c'
-  end
-end
-
-def place_piece!(brd, current_player)
-  if current_player == 'c'
-    computer_places_piece!(brd)
-  else
-    player_places_piece!(brd)
-  end
-end
-
 def board_full?(brd)
   empty_squares(brd).empty?
 end
@@ -188,13 +180,6 @@ def detect_winner(brd)
     end
   end
   nil
-end
-
-def initialize_scoreboard
-  {
-    "Player" => 0,
-    "Computer" => 0
-  }
 end
 
 def update_scoreboard(winner, scoreboard)
@@ -225,6 +210,14 @@ def play_again?
   choice.start_with?('y') ? true : false
 end
 
+def display_winner(brd)
+  if someone_won?(brd)
+    prompt "#{detect_winner(brd)} won!"
+  else
+    prompt "It's a tie!"
+  end
+end
+
 loop do
   system 'clear'
   scoreboard = initialize_scoreboard
@@ -237,7 +230,7 @@ loop do
 
     loop do
       score_prompt(scoreboard)
-      prompt "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
+      prompt "You play #{PLAYER_MARKER}. Computer plays #{COMPUTER_MARKER}"
       display_board(board)
       place_piece!(board, current_player)
       current_player = alternate_player(current_player)
@@ -246,16 +239,11 @@ loop do
     end
 
     score_prompt(scoreboard)
-    prompt "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
+    prompt "You play #{PLAYER_MARKER}. Computer plays #{COMPUTER_MARKER}"
     display_board(board)
-    if someone_won?(board)
-      prompt "#{detect_winner(board)} won!"
-    else
-      prompt "It's a tie!"
-    end
-
+    display_winner(board)
     update_scoreboard(detect_winner(board), scoreboard)
-    # sleep 2
+    sleep 2
     system 'clear'
 
     break winner_prompt(board) if won_five_games?(scoreboard)
