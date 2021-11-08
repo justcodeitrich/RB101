@@ -6,6 +6,7 @@ MESSAGES = YAML.load_file('tictactoe_yaml.yml')
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
+VALID_YES_NO = ['y', 'yes', 'n', 'no']
 
 def prompt(msg)
   puts "#=> #{msg}"
@@ -214,6 +215,16 @@ def winner_prompt(board)
 end
 # rubocop: enable Layout/LineLength
 
+def play_again?
+  prompt MESSAGES['play_again?']
+  choice = gets.strip.downcase
+  until VALID_YES_NO.include?(choice)
+    prompt MESSAGES['invalid_input']
+    choice = gets.strip.downcase
+  end
+  choice.start_with?('y') ? true : false
+end
+
 loop do
   system 'clear'
   scoreboard = initialize_scoreboard
@@ -244,15 +255,13 @@ loop do
     end
 
     update_scoreboard(detect_winner(board), scoreboard)
-    sleep 2
+    # sleep 2
     system 'clear'
 
     break winner_prompt(board) if won_five_games?(scoreboard)
   end
 
-  prompt "Play again? (y or n)"
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  break unless play_again?
 end
 
 prompt "Thanks for playing Tic Tac Toe! Good Bye!"
