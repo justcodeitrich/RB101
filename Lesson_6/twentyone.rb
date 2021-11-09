@@ -48,9 +48,9 @@
   # Begin with input: Hash containing the cards
   # End with output: A string announcing the winner with total amount
 
-  # 52-deck of cards - hash - constant variable
-  # Player's hand - hash 
-  # Dealer's hand - hash
+  # 52-deck of cards - array - constant variable
+  # Player's hand - array 
+  # Dealer's hand - array
 
 # Algorithm
     # 1. Initialize deck
@@ -63,6 +63,9 @@
 
     # 2. Deal cards to player and dealer
       # Initialize a "hand" for player and dealer
+        # use Array#sample to select a sub-array within the deck
+        # once this sub-array(card) has been drawn, remove it from the deck
+        
     # 3. Player turn: hit or stay
     #   - repeat until bust or "stay"
       # Initialize a method to determine Ace value throughout the game
@@ -77,15 +80,9 @@
       # Play again feature
 
 # Code with Intent
-  # Initialize deck
-  # bug 1 - deck keys are overwriting each other, resulting in only spades as the keys at the end of iteration
-    # hash structure I want
-      deck = {'hearts' = {2,3,4,5...}}
-    # instead I can make a nested array. It'll be easier to draw hands using #sample
-
 
   SUITS = %w[hearts diamonds clubs spades]
-  VALUES = [2,3,4,5,6,7,8,9,10,'Jack','Queen','King','Ace']
+  VALUES = [2,3,4,5,6,7,8,9,10,'jack','queen','king','ace']
 
   def initialize_deck
     deck = []
@@ -99,3 +96,32 @@
 
   deck = initialize_deck
 
+
+# 2. Deal cards to player and dealer
+  # Initialize a "hand" for player and dealer
+    # initialize a method deal_hand
+      #input: deck
+      #output: an array of two sub-arrays from deck
+    # use Array#sample to select a sub-array within the deck
+    # once this sub-array(card) has been drawn, remove it from the deck
+      #initialize method remove_card
+        #input: selected sub-array
+        #output: mutated deck without the selected sub-array
+
+  def deal_hand(deck)
+  hand = []
+  card = nil
+    2.times do 
+      card = deck.sample
+      hand << card
+      remove_card(deck,card)
+    end
+    hand
+  end
+
+  def remove_card(deck,card)
+    deck.delete(card)
+  end
+
+  player_hand = deal_hand(deck)
+  dealer_hand = deal_hand(deck)
