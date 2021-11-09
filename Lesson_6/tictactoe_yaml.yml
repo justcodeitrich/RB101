@@ -1,0 +1,6 @@
+decide_who_picks_order: "Who should decide who goes first - you or the computer? \n (Type P for player or C for computer)"
+who_goes_first?: "Who should go first? (Type P for player or C for computer)"
+game_rules: "First to win five games is the winner!"
+the_winner_is: "is the first to win five games!"
+invalid_input: "Invalid input."
+play_again?: "Do you want to play again? Type (y)es to play again or (n)o to exit"
