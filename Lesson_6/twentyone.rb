@@ -87,20 +87,26 @@ require 'pry'
         # check to see if bust - if bust, prompt user and skip to end of game
 
     # 4. If player bust, dealer wins.
-      # write a method that checks the value of bust? method and prints who wins
-        # input: boolean
+      # write a method that prints who wins
+        # input: player and computer values
         # output: string
-          # how to identify who won?
 
       # create the game loop and place announce_winner at end so if player busts, it breaks out of inner loop
     
     # 5. Dealer turn: hit or stay
     #   - repeat until total >= 17
-      # Use a loop
+      # Create a method that goes through dealer sequence
+      # dealer_sequence
+        # draw initial hand
+        # if hand is greater than or equal to 17, stay
+        # if not, draw a new card
+          # repeat until total hand value is over 17
+
     # 6. If dealer bust, player wins.
     # 7. Compare cards and declare winner.
-      # method to check winning condition
-      # Play again feature
+      # compare card values
+
+    # 8. Add feature where only one of the dealer's cards are shown
 
 # Code with Intent
 
@@ -174,7 +180,6 @@ def new_card_value(new_card,current_total)
   value
 end
 
-
 def ace_value(value)
   if (value + 11) > 21
     1
@@ -183,29 +188,18 @@ def ace_value(value)
   end
 end
 
-# for the player_value outside the player_sequence method to be mutated, it would need to be
-# assigned to the return value of player_value from within this method
-# probably better to break it out of this player_sequence
-
-def player_sequence(player_cards,player_value,deck)
-  loop do
-    prompt "Your hand is #{player_cards}."
-    prompt "Your total value is #{player_value}"
-    prompt "Do you want to hit or stay?"
-    answer = gets.chomp.downcase
-    if answer == 'hit'
-      new_card = hit!(deck)
-      add_card_to_hand!(new_card, player_cards)
-      remove_card_from_deck!(deck, new_card)
-      player_value += new_card_value(new_card,player_value)
-      binding.pry
-    elsif answer == 'stay'
-      puts "STAY"
-      break
-    end
-    break if bust?(player_value)
+def display_winner(player_value,dealer_value)
+  if player_value == dealer_value
+    prompt("It's a tie!")
+  elsif player_value > 21
+    prompt("Dealer wins!")
+  else dealer_value > 21
+    player("Player wins!")
   end
-  player_value
+end
+
+def bust_message(player_value)
+  prompt("You went over 21 with a total of #{player_value}! Dealer wins!")
 end
 
 # gameplay
@@ -217,6 +211,7 @@ loop do
   player_value = total_hand_value(player_cards)
   dealer_value = total_hand_value(dealer_cards)
 
+  #player loop
   loop do
     prompt "Your hand is #{player_cards}."
     prompt "Your total value is #{player_value}"
@@ -227,15 +222,24 @@ loop do
       add_card_to_hand!(new_card, player_cards)
       remove_card_from_deck!(deck, new_card)
       player_value += new_card_value(new_card,player_value)
-      binding.pry
+
     elsif answer == 'stay'
       puts "STAY"
       break
+    else 
+      puts "not a valid answer."
     end
+
     break if bust?(player_value)
   end
-
-  binding.pry
-  break if bust?(player_value)
+  # note: even if player busts, dealer keeps drawing
+  # dealer loop
+    until dealer_value >= 17
+      new_card = hit!(deck)
+      add_card_to_hand!(new_card, dealer_cards)
+      remove_card_from_deck!(deck, new_card)
+      dealer_value += new_card_value(new_card,dealer_value)
+      binding.pry
+    end
 
 end
