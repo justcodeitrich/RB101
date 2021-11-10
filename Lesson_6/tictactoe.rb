@@ -98,14 +98,17 @@ def place_piece!(brd, cur_player)
 end
 
 def player_places_piece!(brd)
-  square = ''
+  square = prompt_square_selection(brd)
+  brd[square] = PLAYER_MARKER
+end
+
+def prompt_square_selection(brd)
   loop do
     prompt "Choose a square (#{joinor(empty_squares(brd), ', ', 'or')}):"
     square = gets.chomp.to_i
-    break if empty_squares(brd).include?(square)
+    break square if empty_squares(brd).include?(square)
     prompt MESSAGES['invalid_input']
   end
-  brd[square] = PLAYER_MARKER
 end
 
 def joinor(array, separator, final_separator)
@@ -123,7 +126,7 @@ def joinor(array, separator, final_separator)
   message
 end
 
-def piece_pairs(brd, marker)
+def get_action_pairs(brd, marker)
   ACTION_PAIRS.select do |line|
     brd.values_at(line[0], line[1]).count(marker) == 2
   end
@@ -145,8 +148,8 @@ end
 
 def computer_places_piece!(brd)
   square = nil
-  player_pairs = piece_pairs(brd, PLAYER_MARKER)
-  computer_pairs = piece_pairs(brd, COMPUTER_MARKER)
+  player_pairs = get_action_pairs(brd, PLAYER_MARKER)
+  computer_pairs = get_action_pairs(brd, COMPUTER_MARKER)
 
   # OFFENSE first
   square = comp_offense_defense(computer_pairs, brd, square)
@@ -218,6 +221,12 @@ def display_winner(brd)
   end
 end
 
+def display_game_interface(scrbrd, brd)
+  score_prompt(scrbrd)
+  prompt "You play #{PLAYER_MARKER}. Computer plays #{COMPUTER_MARKER}"
+  display_board(brd)
+end
+
 loop do
   system 'clear'
   scoreboard = initialize_scoreboard
@@ -229,18 +238,14 @@ loop do
     board = initialize_board
 
     loop do
-      score_prompt(scoreboard)
-      prompt "You play #{PLAYER_MARKER}. Computer plays #{COMPUTER_MARKER}"
-      display_board(board)
+      display_game_interface(scoreboard, board)
       place_piece!(board, current_player)
       current_player = alternate_player(current_player)
       system 'clear'
       break if someone_won?(board) || board_full?(board)
     end
 
-    score_prompt(scoreboard)
-    prompt "You play #{PLAYER_MARKER}. Computer plays #{COMPUTER_MARKER}"
-    display_board(board)
+    display_game_interface(scoreboard, board)
     display_winner(board)
     update_scoreboard(detect_winner(board), scoreboard)
     sleep 2
