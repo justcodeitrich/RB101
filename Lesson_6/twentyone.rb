@@ -107,43 +107,88 @@ require 'pry'
     # 7. Compare cards and declare winner.
       # compare card values
 
+
     # Extra features:
       # use HEREDOC to prompt the rules of the game to the player
-      # Only show one of dealer's cards
+      
       # prompt user with what cards they drew
+        # create a method that converts player's hands into user-friendly prompts
+        # input: arrays
+        # output: a string
+
+      # Only show one of dealer's cards
+        #input: array
+        #output: string  
+      
+      # announce the new cards drawn
+
+      # reverse order of suits and values in array to make it easier to code with
+
 
 # Code with Intent
 
-  SUITS = %w[hearts diamonds clubs spades]
-  VALUES = [2,3,4,5,6,7,8,9,10,'jack','queen','king','ace']
+SUITS = %w[hearts diamonds clubs spades]
+VALUES = [2,3,4,5,6,7,8,9,10,'jack','queen','king','ace']
 
-  def initialize_deck
-    deck = []
-    SUITS.each do |suit|
-      VALUES.each do |value|
-        deck << [suit,value]
-      end
+def initialize_deck
+  deck = []
+  SUITS.each do |suit|
+    VALUES.each do |value|
+      deck << [suit,value]
     end
-    deck
   end
+  deck
+end
 
-  def deal_hand(deck)
-  hand = []
-  card = nil
-    2.times do 
-      card = deck.sample
-      hand << card
-      remove_card_from_deck!(deck,card)
-    end
-    hand
+def deal_hand(deck)
+hand = []
+card = nil
+  2.times do 
+    card = deck.sample
+    hand << card
+    remove_card_from_deck!(deck,card)
   end
+  hand
+end
 
-  def remove_card_from_deck!(deck,new_card)
-    deck.delete(new_card)
+def say_players_hand(player_cards)
+  message = 'Your hand is'
+  player_cards.each do |card|
+    message.concat(" #{card[1]} of #{card[0]},")
   end
+  prompt(message.delete_suffix!(","))
+end
+
+def say_players_card_value(player_value)
+  prompt "Your cards total value is #{player_value}"
+end
+
+def say_dealers_hand(dealer_cards)
+  prompt "The dealer has a #{dealer_cards[0][1]} of #{dealer_cards[0][0]} and an unknown card"
+end
+
+def reveal_dealers_hand(dealer_cards)
+  message = "The dealer reveals his hand to show a"
+  dealer_cards.each do |card|
+    message.concat(" #{card[1]} of #{card[0]},")
+  end
+  prompt(message.delete_suffix!(","))
+end
+
+def say_dealer_hits(new_card)
+  prompt "Dealer hits and draws a #{new_card[1]} of #{new_card[0]}"
+end
+
+def remove_card_from_deck!(deck,new_card)
+  deck.delete(new_card)
+end
 
 def bust?(total_hand_value)
   total_hand_value > 21
+end
+
+def say_new_card(new_card)
+  prompt("You drew a #{new_card[1]} of #{new_card[0]}!")
 end
 
 def prompt(msg)
@@ -204,9 +249,9 @@ end
 
 def compare_hand_values(player_value,dealer_value)
   if player_value > dealer_value 
-    prompt "Your hand is greater than dealer's hand!"
+    prompt "You win!"
   elsif player_value < dealer_value
-    prompt "Dealer won with a greater hand of!"
+    prompt "Dealer wins!"
   else
     prompt "It's a tie!"
   end
@@ -214,6 +259,7 @@ end
 
 # gameplay
 loop do
+  # system 'clear'
   deck = initialize_deck
 
   player_cards = deal_hand(deck)
@@ -223,16 +269,20 @@ loop do
 
   #player loop
   loop do
-    prompt "Your hand is #{player_cards}."
-    prompt "Your total value is #{player_value}"
+    say_players_hand(player_cards)
+    say_players_card_value(player_value)
+    say_dealers_hand(dealer_cards)
     prompt "Do you want to hit or stay?"
     answer = gets.chomp.downcase
+    # system 'clear'
+
     if answer == 'hit'
       new_card = hit!(deck)
       add_card_to_hand!(new_card, player_cards)
       remove_card_from_deck!(deck, new_card)
       player_value += new_card_value(new_card,player_value)
-
+      say_new_card(new_card)
+      sleep 1.5
     elsif answer == 'stay'
       puts "STAY"
     else 
@@ -244,11 +294,15 @@ loop do
   # dealer loop
   loop do
     break if bust?(player_value)
+    reveal_dealers_hand(dealer_cards)
+    sleep 1.5
     until dealer_value >= 17
       new_card = hit!(deck)
       add_card_to_hand!(new_card, dealer_cards)
       remove_card_from_deck!(deck, new_card)
       dealer_value += new_card_value(new_card,dealer_value)
+      say_dealer_hits(new_card)
+      sleep 1.5
     end
     break
   end
