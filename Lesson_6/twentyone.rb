@@ -1,6 +1,6 @@
 require 'pry'
-#PEDAC
-
+# PEDAC
+# rubocop:disable all
 # UNDERSTAND THE PROBLEM
   # Create a simplified version of blackjack
   # Components
@@ -124,29 +124,29 @@ require 'pry'
 
       # reverse order of suits and values in array to make it easier to code with
 
-
 # Code with Intent
 
-SUITS = %w[hearts diamonds clubs spades]
-VALUES = [2,3,4,5,6,7,8,9,10,'jack','queen','king','ace']
+# rubocop:enable all
+SUITS = %w(hearts diamonds clubs spades)
+VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
 
 def initialize_deck
   deck = []
   SUITS.each do |suit|
     VALUES.each do |value|
-      deck << [suit,value]
+      deck << [value, suit]
     end
   end
   deck
 end
 
 def deal_hand(deck)
-hand = []
-card = nil
-  2.times do 
+  hand = []
+  card = nil
+  2.times do
     card = deck.sample
     hand << card
-    remove_card_from_deck!(deck,card)
+    remove_card_from_deck!(deck, card)
   end
   hand
 end
@@ -154,7 +154,7 @@ end
 def say_players_hand(player_cards)
   message = 'Your hand is'
   player_cards.each do |card|
-    message.concat(" #{card[1]} of #{card[0]},")
+    message.concat(" #{card[0]} of #{card[1]},")
   end
   prompt(message.delete_suffix!(","))
 end
@@ -163,23 +163,25 @@ def say_players_card_value(player_value)
   prompt "Your cards total value is #{player_value}"
 end
 
+# rubocop: disable all
 def say_dealers_hand(dealer_cards)
-  prompt "The dealer has a #{dealer_cards[0][1]} of #{dealer_cards[0][0]} and an unknown card"
+  prompt "The dealer has a #{dealer_cards[0][0]} of #{dealer_cards[0][1]} and an unknown card"
 end
+# rubocop: enable all
 
 def reveal_dealers_hand(dealer_cards)
   message = "The dealer reveals his hand to show a"
   dealer_cards.each do |card|
-    message.concat(" #{card[1]} of #{card[0]},")
+    message.concat(" #{card[0]} of #{card[1]},")
   end
   prompt(message.delete_suffix!(","))
 end
 
 def say_dealer_hits(new_card)
-  prompt "Dealer hits and draws a #{new_card[1]} of #{new_card[0]}"
+  prompt "Dealer hits and draws a #{new_card[0]} of #{new_card[1]}"
 end
 
-def remove_card_from_deck!(deck,new_card)
+def remove_card_from_deck!(deck, new_card)
   deck.delete(new_card)
 end
 
@@ -188,7 +190,7 @@ def bust?(total_hand_value)
 end
 
 def say_new_card(new_card)
-  prompt("You drew a #{new_card[1]} of #{new_card[0]}!")
+  prompt("You drew a #{new_card[0]} of #{new_card[1]}!")
 end
 
 def prompt(msg)
@@ -199,33 +201,33 @@ def hit!(deck)
   deck.sample
 end
 
-def add_card_to_hand!(new_card,player_cards)
+def add_card_to_hand!(new_card, player_cards)
   player_cards << new_card
 end
 
 def total_hand_value(hand)
   value = 0
   hand.each do |card|
-    case 
-      when card.last == 'ace' then value += ace_value(value)
-      when card.last == 'jack' then value += 10
-      when card.last == 'queen' then value += 10
-      when card.last == 'king' then value += 10
-      else value += card.last
-    end
+    value += case card.first
+             when 'ace' then ace_value(value)
+             when 'jack' then 10
+             when 'queen' then 10
+             when 'king' then 10
+             else card.first
+             end
   end
-  value 
+  value
 end
 
-def new_card_value(new_card,current_total)
+def new_card_value(new_card, current_total)
   value = current_total
-  case 
-    when new_card.last == 'ace' then value = ace_value(value)
-    when new_card.last == 'jack' then value = 10
-    when new_card.last == 'queen' then value = 10
-    when new_card.last == 'king' then value = 10
-    else value = new_card.last
-  end
+  value += case new_card.first
+           when 'ace' then ace_value(value)
+           when 'jack' then 10
+           when 'queen' then 10
+           when 'king' then 10
+           else new_card.first
+           end
   value
 end
 
@@ -237,18 +239,18 @@ def ace_value(value)
   end
 end
 
-def announce_winner(player_value,dealer_value)
+def announce_winner(player_value, dealer_value)
   if bust?(player_value)
-    prompt "You busted with a hand over 21!"  
+    prompt "You busted with a hand over 21!"
   elsif bust?(dealer_value)
     prompt "Dealer has busted with a hand over 21!"
   else
-    compare_hand_values(player_value,dealer_value)
+    compare_hand_values(player_value, dealer_value)
   end
 end
 
-def compare_hand_values(player_value,dealer_value)
-  if player_value > dealer_value 
+def compare_hand_values(player_value, dealer_value)
+  if player_value > dealer_value
     prompt "You win!"
   elsif player_value < dealer_value
     prompt "Dealer wins!"
@@ -266,12 +268,15 @@ loop do
   dealer_cards = deal_hand(deck)
   player_value = total_hand_value(player_cards)
   dealer_value = total_hand_value(dealer_cards)
-
-  #player loop
+  p player_value
+  # player loop
   loop do
     say_players_hand(player_cards)
+    # sleep 0.2
     say_players_card_value(player_value)
+    # sleep 2
     say_dealers_hand(dealer_cards)
+    # sleep 0.2
     prompt "Do you want to hit or stay?"
     answer = gets.chomp.downcase
     # system 'clear'
@@ -280,12 +285,12 @@ loop do
       new_card = hit!(deck)
       add_card_to_hand!(new_card, player_cards)
       remove_card_from_deck!(deck, new_card)
-      player_value += new_card_value(new_card,player_value)
+      player_value = new_card_value(new_card, player_value)
       say_new_card(new_card)
-      sleep 1.5
+      p player_value
+      # sleep 1.5
     elsif answer == 'stay'
-      puts "STAY"
-    else 
+    else
       puts "not a valid answer."
     end
     break if bust?(player_value) || answer == 'stay'
@@ -300,7 +305,7 @@ loop do
       new_card = hit!(deck)
       add_card_to_hand!(new_card, dealer_cards)
       remove_card_from_deck!(deck, new_card)
-      dealer_value += new_card_value(new_card,dealer_value)
+      dealer_value += new_card_value(new_card, dealer_value)
       say_dealer_hits(new_card)
       sleep 1.5
     end
@@ -308,9 +313,6 @@ loop do
   end
 
   announce_winner(player_value, dealer_value)
-  puts "player hand #{player_cards} and value #{player_value}"
-  puts "dealer hand #{dealer_cards} and value #{dealer_value}"
-
   puts "play again?"
   break if gets.chomp.downcase.include?('n')
 end
