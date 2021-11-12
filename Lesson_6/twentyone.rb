@@ -268,18 +268,17 @@ loop do
   dealer_cards = deal_hand(deck)
   player_value = total_hand_value(player_cards)
   dealer_value = total_hand_value(dealer_cards)
-  p player_value
+
   # player loop
   loop do
     say_players_hand(player_cards)
-    # sleep 0.2
+
     say_players_card_value(player_value)
-    # sleep 2
+
     say_dealers_hand(dealer_cards)
-    # sleep 0.2
+
     prompt "Do you want to hit or stay?"
     answer = gets.chomp.downcase
-    # system 'clear'
 
     if answer == 'hit'
       new_card = hit!(deck)
@@ -287,8 +286,7 @@ loop do
       remove_card_from_deck!(deck, new_card)
       player_value = new_card_value(new_card, player_value)
       say_new_card(new_card)
-      p player_value
-      # sleep 1.5
+
     elsif answer == 'stay'
     else
       puts "not a valid answer."
@@ -300,14 +298,14 @@ loop do
   loop do
     break if bust?(player_value)
     reveal_dealers_hand(dealer_cards)
-    sleep 1.5
+
     until dealer_value >= 17
       new_card = hit!(deck)
       add_card_to_hand!(new_card, dealer_cards)
       remove_card_from_deck!(deck, new_card)
-      dealer_value += new_card_value(new_card, dealer_value)
+      dealer_value = new_card_value(new_card, dealer_value)
       say_dealer_hits(new_card)
-      sleep 1.5
+
     end
     break
   end
