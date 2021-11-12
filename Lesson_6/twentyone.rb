@@ -2,6 +2,8 @@ require 'pry'
 
 SUITS = %w(hearts diamonds clubs spades)
 VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
+MAX_CARD_LIMIT = 21
+DEALER_HITS_UNTIL = 17
 
 def initialize_deck
   deck = []
@@ -59,7 +61,7 @@ def remove_card_from_deck!(deck, new_card)
 end
 
 def bust?(total_hand_value)
-  total_hand_value > 21
+  total_hand_value > MAX_CARD_LIMIT
 end
 
 def say_new_card(new_card)
@@ -105,7 +107,7 @@ def new_card_value(new_card, current_total)
 end
 
 def ace_value(value)
-  if (value + 11) > 21
+  if (value + 11) > MAX_CARD_LIMIT
     1
   else
     11
@@ -199,7 +201,7 @@ loop do
     break if bust?(player_total)
     reveal_dealers_hand(dealer_cards)
 
-    until dealer_total >= 17
+    until dealer_total >= DEALER_HITS_UNTIL
       new_card = hit!(deck)
       add_card_to_hand!(new_card, dealer_cards)
       remove_card_from_deck!(deck, new_card)
@@ -216,7 +218,7 @@ loop do
     prompt "You have no more chips! Better luck next time."
     break
   end
-  
+
   break unless play_again?
 end
 
