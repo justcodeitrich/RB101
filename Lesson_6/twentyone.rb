@@ -139,14 +139,14 @@ loop do
 
   player_cards = deal_hand(deck)
   dealer_cards = deal_hand(deck)
-  player_value = total_hand_value(player_cards)
-  dealer_value = total_hand_value(dealer_cards)
+  player_total = total_hand_value(player_cards)
+  dealer_total = total_hand_value(dealer_cards)
 
   # player loop
   loop do
     say_players_hand(player_cards)
 
-    say_players_card_value(player_value)
+    say_players_card_value(player_total)
 
     say_dealers_hand(dealer_cards)
 
@@ -157,33 +157,33 @@ loop do
       new_card = hit!(deck)
       add_card_to_hand!(new_card, player_cards)
       remove_card_from_deck!(deck, new_card)
-      player_value = new_card_value(new_card, player_value)
+      player_total = new_card_value(new_card, player_total)
       say_new_card(new_card)
 
     elsif answer == 'stay'
     else
       puts "not a valid answer."
     end
-    break if bust?(player_value) || answer == 'stay'
+    break if bust?(player_total) || answer == 'stay'
   end
 
   # dealer loop
   loop do
-    break if bust?(player_value)
+    break if bust?(player_total)
     reveal_dealers_hand(dealer_cards)
 
-    until dealer_value >= 17
+    until dealer_total >= 17
       new_card = hit!(deck)
       add_card_to_hand!(new_card, dealer_cards)
       remove_card_from_deck!(deck, new_card)
-      dealer_value = new_card_value(new_card, dealer_value)
+      dealer_total = new_card_value(new_card, dealer_total)
       say_dealer_hits(new_card)
 
     end
     break
   end
 
-  announce_winner(player_value, dealer_value)
+  announce_winner(player_total, dealer_total)
   puts "play again?"
   break if gets.chomp.downcase.include?('n')
 end
