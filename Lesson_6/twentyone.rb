@@ -32,8 +32,8 @@ def say_players_hand(player_cards)
   prompt(message.delete_suffix!(","))
 end
 
-def say_players_card_value(player_value)
-  prompt "Your cards total value is #{player_value}"
+def say_players_card_value(player_total)
+  prompt "Your cards total value is #{player_total}"
 end
 
 # rubocop: disable all
@@ -112,42 +112,69 @@ def ace_value(value)
   end
 end
 
-def announce_winner(player_value, dealer_value)
-  if bust?(player_value)
+def announce_winner(player_total, dealer_total)
+  if bust?(player_total)
     prompt "You busted with a hand over 21!"
-  elsif bust?(dealer_value)
+  elsif bust?(dealer_total)
     prompt "Dealer has busted with a hand over 21!"
   else
-    compare_hand_values(player_value, dealer_value)
+    compare_hand_values(player_total, dealer_total)
   end
 end
 
-def compare_hand_values(player_value, dealer_value)
-  if player_value > dealer_value
+def compare_hand_values(player_total, dealer_total)
+  if player_total > dealer_total
     prompt "You win!"
-  elsif player_value < dealer_value
+  elsif player_total < dealer_total
     prompt "Dealer wins!"
   else
     prompt "It's a tie!"
   end
 end
 
+def play_again?
+  prompt "Do you want to play again? (y or n)"
+  answer = gets.chomp
+  answer.downcase.start_with?('y')
+end
+
+def player_bet(player_chips)
+  prompt "You have #{player_chips} chips"
+  prompt "How many chips do you want to bet?"
+  bet = gets.chomp.to_i
+end
+
+def bet_results(chips_bet,player_total,dealer_total,player_chips)
+  if bust?(player_total)
+    player_chips - chips_bet
+  elsif bust?(dealer_total)
+    player_chips + chips_bet
+  elsif player_total > dealer_total
+    player_chips + chips_bet
+  elsif player_total < dealer_total
+    player_chips - chips_bet  
+  else
+    player_chips
+  end
+end
+
 # gameplay
+player_chips = 10
 loop do
-  # system 'clear'
+  
   deck = initialize_deck
 
   player_cards = deal_hand(deck)
   dealer_cards = deal_hand(deck)
   player_total = total_hand_value(player_cards)
   dealer_total = total_hand_value(dealer_cards)
+  
+  chips_bet = player_bet(player_chips)
 
   # player loop
   loop do
     say_players_hand(player_cards)
-
     say_players_card_value(player_total)
-
     say_dealers_hand(dealer_cards)
 
     prompt "Do you want to hit or stay?"
@@ -184,6 +211,20 @@ loop do
   end
 
   announce_winner(player_total, dealer_total)
-  puts "play again?"
-  break if gets.chomp.downcase.include?('n')
+  player_chips = bet_results(chips_bet,player_total,dealer_total,player_chips)
+  if player_chips == 0
+    prompt "You have no more chips! Better luck next time."
+    break
+  end
+  
+  break unless play_again?
 end
+
+# bonus feature 4
+# Start with 10 chips
+# Prompt player to bet an amount
+  # If player wins, match the bet amount of chips and add to player
+  # If player loses, substract the bet amount from player
+  # If player loses everything, say good bye
+
+# Check input for all user inputs
