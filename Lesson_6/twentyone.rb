@@ -1,4 +1,3 @@
-require 'pry'
 SUITS = %w(hearts diamonds clubs spades)
 VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
 MAX_CARD_LIMIT = 21
