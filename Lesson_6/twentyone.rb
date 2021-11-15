@@ -120,7 +120,6 @@ end
 def total_hand_value(cards, current_total=0)
 
   cards.each do |card|
-    # binding.pry
     card_value = card[:value]
     current_total += case card_value
              when 'ace' then ace_value(current_total)
@@ -212,22 +211,7 @@ def display_chip_changes(chips_bet, player_chips, pre_game_chips)
   end
 end
 
-# gameplay
-system 'clear'
-puts MSG
-player_chips = 10
-
-loop do
-  deck = initialize_deck
-  player_cards = deal_hand(deck)
-  dealer_cards = deal_hand(deck)
-  player_total = total_hand_value(player_cards)
-  dealer_total = total_hand_value(dealer_cards)
-  chips_bet = player_bet(player_chips)
-  pre_game_chips = player_chips
-  player_move = ''
-
-  # player loop
+def player_loop(dealer_cards,player_cards,player_total,deck)
   loop do
     system 'clear'
     say_dealers_hand(dealer_cards)
@@ -249,11 +233,15 @@ loop do
     end
     break if bust?(player_total)
   end
+  player_total
+end
 
-  # dealer loop
+# when the player busts, the player_total remains the same. How to mutate the outer player_total thats immutable? 
+
+def dealer_loop(player_total,deck,dealer_cards,dealer_total)
   loop do
     break if bust?(player_total)
-    system 'clear'
+    # system 'clear'
     reveal_dealers_hand(dealer_cards)
     sleep 2
     until dealer_total >= DEALER_HITS_UNTIL
@@ -266,7 +254,30 @@ loop do
     end
     break
   end
+  dealer_total
+end
 
+# gameplay
+system 'clear'
+puts MSG
+player_chips = 10
+
+loop do
+  deck = initialize_deck
+  player_cards = deal_hand(deck)
+  dealer_cards = deal_hand(deck)
+  player_total = total_hand_value(player_cards)
+  dealer_total = total_hand_value(dealer_cards)
+  chips_bet = player_bet(player_chips)
+  pre_game_chips = player_chips
+  player_move = ''
+
+  # player loop
+  player_total = player_loop(dealer_cards,player_cards,player_total,deck)
+  
+  # dealer loop
+  dealer_total = dealer_loop(player_total,deck,dealer_cards,dealer_total)
+  
   announce_winner(player_total, dealer_total)
   player_chips = bet_result(chips_bet, player_total, dealer_total, player_chips)
   display_chip_changes(chips_bet, player_chips, pre_game_chips)
