@@ -65,12 +65,19 @@ end
 def player_bet(player_chips)
   prompt "You have #{player_chips} chips"
   prompt "You can bet up to #{player_chips} chips. How many do you want to bet?"
-  answer = gets.chomp.to_i
-  until answer <= player_chips && answer > 0
-    prompt "Sorry that's not a valid bet"
-    answer = gets.chomp.to_i
+  answer = gets.chomp
+  validate_bet(answer, player_chips)
+end
+
+def validate_bet(answer, chips)
+  loop do
+    if answer.to_i <= chips && answer.to_i > 0 && !answer.to_s.include?('.')
+      return answer.to_i
+    else
+      prompt "Sorry that's not a valid bet"
+      answer = gets.chomp
+    end
   end
-  answer
 end
 
 def remove_card_from_deck!(deck, new_card)
