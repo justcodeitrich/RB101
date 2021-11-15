@@ -1,4 +1,3 @@
-require 'pry'
 SUITS = %w(hearts diamonds clubs spades)
 VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
 MAX_CARD_LIMIT = 21
@@ -62,7 +61,7 @@ def reveal_dealers_hand(dealer_cards)
 end
 
 def say_dealer_hits(new_card)
-  prompt "Dealer hits and draws a #{new_card[0][:value]} of #{new_card[0][:suit]}"
+  prompt "Dealer hit and drew a #{new_card[0][:value]} of #{new_card[0][:suit]}"
 end
 
 def player_bet(player_chips)
@@ -118,35 +117,17 @@ def add_card_to_hand!(new_card, player_cards)
 end
 
 def total_hand_value(cards, current_total=0)
-
   cards.each do |card|
     card_value = card[:value]
     current_total += case card_value
-             when 'ace' then ace_value(current_total)
-             when 'jack' then 10
-             when 'queen' then 10
-             when 'king' then 10
-             else card[:value]
-             end
+                     when 'ace' then ace_value(current_total)
+                     when 'jack' then 10
+                     when 'queen' then 10
+                     when 'king' then 10
+                     else card[:value]
+                     end
   end
   current_total
-end
-
-# refactor new_card_value to total_hand_value
-  # This method will return an integer reflecting the total value of all cards
-    # This will be use in the beginning to calculate the player's two cards
-    # Also used when new card is added to hand to calculate total new value
-
-def new_card_value(new_card, current_total)
-  value = current_total
-  value += case new_card[:value]
-           when 'ace' then ace_value(value)
-           when 'jack' then 10
-           when 'queen' then 10
-           when 'king' then 10
-           else new_card[:value]
-           end
-  value
 end
 
 def ace_value(value)
@@ -159,9 +140,11 @@ end
 
 def announce_winner(player_total, dealer_total)
   if bust?(player_total)
-    prompt "You busted with a hand over #{MAX_CARD_LIMIT}! You lose!"
+    prompt "Your total is #{player_total}.
+    You busted with a hand over #{MAX_CARD_LIMIT}! You lose!"
   elsif bust?(dealer_total)
-    prompt "Dealer has busted with a hand over #{MAX_CARD_LIMIT}! You win!"
+    prompt "Dealer's total is #{dealer_total}.
+    That's a bust with a hand over #{MAX_CARD_LIMIT}! You win!"
   else
     compare_hand_values(player_total, dealer_total)
   end
@@ -211,7 +194,7 @@ def display_chip_changes(chips_bet, player_chips, pre_game_chips)
   end
 end
 
-def player_loop(dealer_cards,player_cards,player_total,deck)
+def player_loop(dealer_cards, player_cards, player_total, deck)
   loop do
     system 'clear'
     say_dealers_hand(dealer_cards)
@@ -219,15 +202,8 @@ def player_loop(dealer_cards,player_cards,player_total,deck)
     say_players_card_value(player_total)
     sleep 2
     player_move = ask_hit_or_stay(player_move)
-
     if player_move == 'h'
-      new_card = hit!(deck)
-      add_card_to_hand!(new_card, player_cards)
-      remove_card_from_deck!(deck, new_card)
-      player_total = total_hand_value(new_card, player_total)
-      say_new_card(new_card)
-      sleep 2
-      system 'clear'
+      player_total = hit_sequence(deck, player_cards, player_total)
     elsif player_move == 's'
       break
     end
@@ -236,12 +212,18 @@ def player_loop(dealer_cards,player_cards,player_total,deck)
   player_total
 end
 
-# when the player busts, the player_total remains the same. How to mutate the outer player_total thats immutable? 
+def hit_sequence(deck, player_cards, player_total)
+  new_card = hit!(deck)
+  add_card_to_hand!(new_card, player_cards)
+  remove_card_from_deck!(deck, new_card)
+  say_new_card(new_card)
+  sleep 2
+  total_hand_value(new_card, player_total)
+end
 
-def dealer_loop(player_total,deck,dealer_cards,dealer_total)
+def dealer_loop(player_total, deck, dealer_cards, dealer_total)
   loop do
     break if bust?(player_total)
-    # system 'clear'
     reveal_dealers_hand(dealer_cards)
     sleep 2
     until dealer_total >= DEALER_HITS_UNTIL
@@ -270,14 +252,13 @@ loop do
   dealer_total = total_hand_value(dealer_cards)
   chips_bet = player_bet(player_chips)
   pre_game_chips = player_chips
-  player_move = ''
 
   # player loop
-  player_total = player_loop(dealer_cards,player_cards,player_total,deck)
-  
+  player_total = player_loop(dealer_cards, player_cards, player_total, deck)
+  system 'clear'
   # dealer loop
-  dealer_total = dealer_loop(player_total,deck,dealer_cards,dealer_total)
-  
+  dealer_total = dealer_loop(player_total, deck, dealer_cards, dealer_total)
+
   announce_winner(player_total, dealer_total)
   player_chips = bet_result(chips_bet, player_total, dealer_total, player_chips)
   display_chip_changes(chips_bet, player_chips, pre_game_chips)
