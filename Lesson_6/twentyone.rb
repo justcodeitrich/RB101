@@ -62,7 +62,7 @@ def reveal_dealers_hand(dealer_cards)
 end
 
 def say_dealer_hits(new_card)
-  prompt "Dealer hits and draws a #{new_card[:value]} of #{new_card[:suit]}"
+  prompt "Dealer hits and draws a #{new_card[0][:value]} of #{new_card[0][:suit]}"
 end
 
 def player_bet(player_chips)
@@ -102,7 +102,7 @@ def ask_hit_or_stay(player_move)
 end
 
 def say_new_card(new_card)
-  prompt("You drew a #{new_card[:value]} of #{new_card[:suit]}!")
+  prompt("You drew a #{new_card[0][:value]} of #{new_card[0][:suit]}!")
 end
 
 def prompt(msg)
@@ -110,26 +110,33 @@ def prompt(msg)
 end
 
 def hit!(deck)
-  deck.sample
+  [deck.sample]
 end
 
 def add_card_to_hand!(new_card, player_cards)
-  player_cards << new_card
+  player_cards << new_card[0]
 end
 
-def total_hand_value(hand)
-  value = 0
-  hand.each do |card|
-    value += case card[:value]
-             when 'ace' then ace_value(value)
+def total_hand_value(cards, current_total=0)
+
+  cards.each do |card|
+    # binding.pry
+    card_value = card[:value]
+    current_total += case card_value
+             when 'ace' then ace_value(current_total)
              when 'jack' then 10
              when 'queen' then 10
              when 'king' then 10
              else card[:value]
              end
   end
-  value
+  current_total
 end
+
+# refactor new_card_value to total_hand_value
+  # This method will return an integer reflecting the total value of all cards
+    # This will be use in the beginning to calculate the player's two cards
+    # Also used when new card is added to hand to calculate total new value
 
 def new_card_value(new_card, current_total)
   value = current_total
@@ -233,7 +240,7 @@ loop do
       new_card = hit!(deck)
       add_card_to_hand!(new_card, player_cards)
       remove_card_from_deck!(deck, new_card)
-      player_total = new_card_value(new_card, player_total)
+      player_total = total_hand_value(new_card, player_total)
       say_new_card(new_card)
       sleep 2
       system 'clear'
@@ -253,7 +260,7 @@ loop do
       new_card = hit!(deck)
       add_card_to_hand!(new_card, dealer_cards)
       remove_card_from_deck!(deck, new_card)
-      dealer_total = new_card_value(new_card, dealer_total)
+      dealer_total = total_hand_value(new_card, dealer_total)
       say_dealer_hits(new_card)
       sleep 2
     end
