@@ -15,7 +15,10 @@ def initialize_deck
   deck = []
   SUITS.each do |suit|
     VALUES.each do |value|
-      deck << [value, suit]
+      deck << {
+        suit: suit,
+        value: value
+      }
     end
   end
   deck
@@ -35,7 +38,7 @@ end
 def say_players_hand(player_cards)
   message = 'Your hand is'
   player_cards.each do |card|
-    message.concat(" #{card[0]} of #{card[1]},")
+    message.concat(" #{card[:value]} of #{card[:suit]},")
   end
   prompt(message.delete_suffix!(","))
 end
@@ -46,20 +49,20 @@ end
 
 # rubocop: disable all
 def say_dealers_hand(dealer_cards)
-  prompt "The dealer has a #{dealer_cards[0][0]} of #{dealer_cards[0][1]} and an unknown card"
+  prompt "The dealer has a #{dealer_cards[0][:value]} of #{dealer_cards[1][:suit]} and an unknown card"
 end
 # rubocop: enable all
 
 def reveal_dealers_hand(dealer_cards)
   message = "The dealer reveals his hand to show a"
   dealer_cards.each do |card|
-    message.concat(" #{card[0]} of #{card[1]},")
+    message.concat(" #{card[:value]} of #{card[:suit]},")
   end
   prompt(message.delete_suffix!(","))
 end
 
 def say_dealer_hits(new_card)
-  prompt "Dealer hits and draws a #{new_card[0]} of #{new_card[1]}"
+  prompt "Dealer hits and draws a #{new_card[:value]} of #{new_card[:suit]}"
 end
 
 def player_bet(player_chips)
@@ -99,7 +102,7 @@ def ask_hit_or_stay(player_move)
 end
 
 def say_new_card(new_card)
-  prompt("You drew a #{new_card[0]} of #{new_card[1]}!")
+  prompt("You drew a #{new_card[:value]} of #{new_card[:suit]}!")
 end
 
 def prompt(msg)
@@ -117,12 +120,12 @@ end
 def total_hand_value(hand)
   value = 0
   hand.each do |card|
-    value += case card.first
+    value += case card[:value]
              when 'ace' then ace_value(value)
              when 'jack' then 10
              when 'queen' then 10
              when 'king' then 10
-             else card.first
+             else card[:value]
              end
   end
   value
@@ -130,12 +133,12 @@ end
 
 def new_card_value(new_card, current_total)
   value = current_total
-  value += case new_card.first
+  value += case new_card[:value]
            when 'ace' then ace_value(value)
            when 'jack' then 10
            when 'queen' then 10
            when 'king' then 10
-           else new_card.first
+           else new_card[:value]
            end
   value
 end
@@ -192,7 +195,7 @@ def bet_result(chips_bet, player_total, dealer_total, player_chips)
   end
 end
 
-def display_chip_changes(chips_bet,player_chips,pre_game_chips)
+def display_chip_changes(chips_bet, player_chips, pre_game_chips)
   if pre_game_chips < player_chips
     prompt "You won #{chips_bet} chips!"
   elsif pre_game_chips > player_chips
@@ -200,7 +203,7 @@ def display_chip_changes(chips_bet,player_chips,pre_game_chips)
   else
     prompt "You remained with the same amount of chips"
   end
-end 
+end
 
 # gameplay
 system 'clear'
@@ -259,7 +262,7 @@ loop do
 
   announce_winner(player_total, dealer_total)
   player_chips = bet_result(chips_bet, player_total, dealer_total, player_chips)
-  display_chip_changes(chips_bet,player_chips,pre_game_chips)
+  display_chip_changes(chips_bet, player_chips, pre_game_chips)
   if player_chips == 0
     prompt "You have no more chips! Better luck next time. Goodbye!"
     break
