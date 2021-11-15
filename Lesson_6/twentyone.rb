@@ -90,10 +90,10 @@ end
 
 def ask_hit_or_stay(player_move)
   loop do
-    prompt "Do you want to hit or stay?"
-    player_move = gets.chomp.downcase
-    break if ['hit', 'stay'].include?(player_move)
-    prompt "Sorry must type hit or stay"
+    prompt "Do you want to hit or stay? Type h or s."
+    player_move = gets.strip.downcase
+    break if ['h', 's'].include?(player_move)
+    prompt "Sorry must type h for hit or s for stay"
   end
   player_move
 end
@@ -192,6 +192,16 @@ def bet_result(chips_bet, player_total, dealer_total, player_chips)
   end
 end
 
+def display_chip_changes(chips_bet,player_chips,pre_game_chips)
+  if pre_game_chips < player_chips
+    prompt "You won #{chips_bet} chips!"
+  elsif pre_game_chips > player_chips
+    prompt "You lost #{chips_bet} chips!"
+  else
+    prompt "You remained with the same amount of chips"
+  end
+end 
+
 # gameplay
 system 'clear'
 puts MSG
@@ -204,6 +214,7 @@ loop do
   player_total = total_hand_value(player_cards)
   dealer_total = total_hand_value(dealer_cards)
   chips_bet = player_bet(player_chips)
+  pre_game_chips = player_chips
   player_move = ''
 
   # player loop
@@ -215,7 +226,7 @@ loop do
     sleep 2
     player_move = ask_hit_or_stay(player_move)
 
-    if player_move == 'hit'
+    if player_move == 'h'
       new_card = hit!(deck)
       add_card_to_hand!(new_card, player_cards)
       remove_card_from_deck!(deck, new_card)
@@ -223,7 +234,7 @@ loop do
       say_new_card(new_card)
       sleep 2
       system 'clear'
-    elsif player_move == 'stay'
+    elsif player_move == 's'
       break
     end
     break if bust?(player_total)
@@ -248,6 +259,7 @@ loop do
 
   announce_winner(player_total, dealer_total)
   player_chips = bet_result(chips_bet, player_total, dealer_total, player_chips)
+  display_chip_changes(chips_bet,player_chips,pre_game_chips)
   if player_chips == 0
     prompt "You have no more chips! Better luck next time. Goodbye!"
     break
