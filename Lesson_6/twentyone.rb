@@ -1,3 +1,4 @@
+require 'pry'
 SUITS = %w(hearts diamonds clubs spades)
 VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king', 'ace']
 MAX_CARD_LIMIT = 21
@@ -170,14 +171,14 @@ def play_again?
   choice.start_with?('y') ? true : false
 end
 
-def bet_result(chips_bet, player_total, dealer_total, player_chips)
-  if bust?(player_total)
+def bet_result(chips_bet, player_chips, totals)
+  if bust?(totals[:player])
     player_chips - chips_bet
-  elsif bust?(dealer_total)
+  elsif bust?(totals[:dealer])
     player_chips + chips_bet
-  elsif player_total > dealer_total
+  elsif totals[:player] > totals[:dealer]
     player_chips + chips_bet
-  elsif player_total < dealer_total
+  elsif totals[:player] < totals[:dealer]
     player_chips - chips_bet
   else
     player_chips
@@ -194,22 +195,21 @@ def display_chip_changes(chips_bet, player_chips, pre_game_chips)
   end
 end
 
-def player_loop(dealer_cards, player_cards, player_total, deck)
+def player_loop(dealer_cards, player_cards, deck, totals)
   loop do
     system 'clear'
     say_dealers_hand(dealer_cards)
     say_players_hand(player_cards)
-    say_players_card_value(player_total)
+    say_players_card_value(totals[:player])
     sleep 2
     player_move = ask_hit_or_stay(player_move)
     if player_move == 'h'
-      player_total = hit_sequence(deck, player_cards, player_total)
+      totals[:player] = hit_sequence(deck, player_cards, totals[:player])
     elsif player_move == 's'
       break
     end
-    break if bust?(player_total)
+    break if bust?(totals[:player])
   end
-  player_total
 end
 
 def hit_sequence(deck, player_cards, player_total)
@@ -221,46 +221,45 @@ def hit_sequence(deck, player_cards, player_total)
   total_hand_value(new_card, player_total)
 end
 
-def dealer_loop(player_total, deck, dealer_cards, dealer_total)
+def dealer_loop(player_total, deck, dealer_cards, totals)
   loop do
     break if bust?(player_total)
     reveal_dealers_hand(dealer_cards)
     sleep 2
-    until dealer_total >= DEALER_HITS_UNTIL
+    until totals[:dealer] >= DEALER_HITS_UNTIL
       new_card = hit!(deck)
       add_card_to_hand!(new_card, dealer_cards)
       remove_card_from_deck!(deck, new_card)
-      dealer_total = total_hand_value(new_card, dealer_total)
+      totals[:dealer] = total_hand_value(new_card, totals[:dealer])
       say_dealer_hits(new_card)
       sleep 2
     end
     break
   end
-  dealer_total
 end
 
 # gameplay
 system 'clear'
 puts MSG
 player_chips = 10
+totals = { player: 0, dealer: 0 }
 
 loop do
   deck = initialize_deck
   player_cards = deal_hand(deck)
   dealer_cards = deal_hand(deck)
-  player_total = total_hand_value(player_cards)
-  dealer_total = total_hand_value(dealer_cards)
+  totals[:player] = total_hand_value(player_cards)
+  totals[:dealer] = total_hand_value(dealer_cards)
   chips_bet = player_bet(player_chips)
   pre_game_chips = player_chips
 
   # player loop
-  player_total = player_loop(dealer_cards, player_cards, player_total, deck)
+  player_loop(dealer_cards, player_cards, deck, totals)
   system 'clear'
   # dealer loop
-  dealer_total = dealer_loop(player_total, deck, dealer_cards, dealer_total)
-
-  announce_winner(player_total, dealer_total)
-  player_chips = bet_result(chips_bet, player_total, dealer_total, player_chips)
+  dealer_loop(totals[:player], deck, dealer_cards, totals)
+  announce_winner(totals[:player], totals[:dealer])
+  player_chips = bet_result(chips_bet, player_chips, totals)
   display_chip_changes(chips_bet, player_chips, pre_game_chips)
   if player_chips == 0
     prompt "You have no more chips! Better luck next time. Goodbye!"
